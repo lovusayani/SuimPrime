@@ -1,0 +1,196 @@
+<template>
+    <div class="row justify-content-center align-items-center vh-100">
+        <div class="col-lg-5 col-md-8 col-11">
+            <div class="card user-login-card my-5 p-4">
+                <!-- Header -->
+                <div class="text-center auth-heading mb-3">
+                    <a href="#" class="d-inline-block mb-2">
+                        <img
+                            src="/public/assets/logo/dark_logo.png"
+                            alt="Logo"
+                            class="img-fluid logo h-4 mb-2"
+                        />
+                    </a>
+                    <h5>
+                        Welcome Back to Suim Prime: Your Ultimate Entertainment
+                        Hub!
+                    </h5>
+                    <p class="fs-14">We've eagerly awaited your return.</p>
+                </div>
+
+                <!-- Error Message -->
+                <p class="text-danger" v-if="errorMessage">
+                    {{ errorMessage }}
+                </p>
+
+                <!-- Login Form -->
+                <form @submit.prevent="login" novalidate>
+                    <input type="hidden" name="_token" value="..." />
+                    <div class="input-group mb-3">
+                        <span class="input-group-text px-0"
+                            ><i class="ph ph-envelope"></i
+                        ></span>
+                        <input
+                            type="email"
+                            v-model="email"
+                            class="form-control"
+                            placeholder="Email"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text px-0"
+                            ><i class="ph ph-lock-key"></i
+                        ></span>
+                        <input
+                            :type="showPassword ? 'text' : 'password'"
+                            v-model="password"
+                            class="form-control"
+                            placeholder="Enter password"
+                            required
+                        />
+                        <span
+                            class="input-group-text px-0"
+                            style="cursor: pointer"
+                            @click="togglePassword"
+                        >
+                            <i
+                                :class="
+                                    showPassword
+                                        ? 'ph ph-eye'
+                                        : 'ph ph-eye-slash'
+                                "
+                            ></i>
+                        </span>
+                    </div>
+
+                    <div
+                        class="d-flex flex-wrap align-items-center justify-content-between mb-3"
+                    >
+                        <label class="form-check-label">
+                            <input
+                                type="checkbox"
+                                v-model="rememberMe"
+                                class="form-check-input me-2"
+                            />
+                            Remember Me
+                        </label>
+                        <a href="#">Forgot Password?</a>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Sign In
+                        </button>
+                    </div>
+
+                    <p class="text-center mb-3">
+                        Don't have an account? <a href="/signup">Sign up</a>
+                    </p>
+
+                    <div class="border-style text-center mb-3">
+                        <span>Or</span>
+                    </div>
+
+                    <!-- Social Buttons -->
+                    <!-- <div class="d-grid gap-2">
+                        <button
+                            class="btn btn-dark w-100"
+                            @click.prevent="loginWithGoogle"
+                        >
+                            <svg
+                                class="me-2"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                            >
+                              
+                            </svg>
+                            Sign in with Google
+                        </button>
+                        <button
+                            class="btn btn-dark w-100"
+                            @click.prevent="loginWithOTP"
+                        >
+                            Login With OTP
+                        </button>
+                        <a href="#" class="btn btn-link text-center mt-2"
+                            >Admin Panel</a
+                        >
+                    </div> -->
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import axios from "../axios";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const email = ref("test2@gmail.com");
+const password = ref("12345678");
+const rememberMe = ref(false);
+const showPassword = ref(false);
+const errorMessage = ref("");
+const router = useRouter();
+
+const togglePassword = () => {
+    showPassword.value = !showPassword.value;
+};
+
+// axios instance configured in ../axios.js handles baseURL and withCredentials
+
+const login = async () => {
+    try {
+        // Step 1: Get CSRF cookie
+        await axios.get("/sanctum/csrf-cookie");
+
+        // Step 2: Submit login to API login route
+        const res = await axios.post("/api/login", {
+            email: email.value,
+            password: password.value,
+        });
+        console.log(email);
+
+        // Step 3: Save token or user data if returned
+        // With Sanctum cookie-based auth we don't store token client-side.
+        // Navigate to Home; Home will call /api/me to fetch user via cookie.
+        router.push({ name: "Home" });
+    } catch (err) {
+        console.error("Login error:", err);
+        errorMessage.value = err.response?.data?.message || "Login failed";
+    }
+};
+</script>
+
+<style scoped>
+.user-login-card {
+    padding: 2.5em;
+    margin: 0 auto;
+    -webkit-backdrop-filter: blur(1.5625em);
+    backdrop-filter: blur(1.5625em);
+}
+.user-login-card .auth-heading {
+    margin-bottom: 2rem;
+}
+.user-login-card .input-group {
+    border-bottom: 1px solid var(--bs-border-color);
+    margin-bottom: 1.75rem;
+}
+.user-login-card .input-group .form-control {
+    padding: 0.786rem 0.75rem;
+}
+.user-login-card .input-group .form-control:focus {
+    border-color: transparent;
+}
+.user-login-card .logo {
+    height: 45px;
+}
+.user-login-card .full-button {
+    margin-top: 3.75rem;
+}
+</style>
