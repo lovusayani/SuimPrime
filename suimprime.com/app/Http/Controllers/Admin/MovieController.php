@@ -7,8 +7,10 @@ use App\Models\Actor;
 use App\Models\Director;
 use App\Models\Genre;
 use App\Models\Movie;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
 {
@@ -62,11 +64,65 @@ class MovieController extends Controller
                 'enable_subtitle' => $request->enable_subtitle ?? 0,
             ]);
 
+            // Move images from temp_uploads to media and register media rows; return public URL
+            $processMediaUrl = function ($inputUrl) {
+                if (empty($inputUrl)) return [null, null];
+
+                $path = parse_url($inputUrl, PHP_URL_PATH) ?: '';
+                $filename = basename($path);
+                if (!$filename || $filename === '/' || strpos($filename, '.') === false) {
+                    return [$inputUrl, null];
+                }
+
+                $src = 'temp_uploads/' . $filename;
+                $dest = 'media/' . $filename;
+
+                // If already a media URL, ensure media row exists
+                if (strpos($path, '/media/') !== false) {
+                    $relative = '/media/' . $filename;
+                    if (!Media::where('url', $relative)->exists()) {
+                        Media::create([
+                            'url' => $relative,
+                            'type' => 'image',
+                            'title' => $filename,
+                            'mediable_id' => null,
+                            'mediable_type' => null,
+                        ]);
+                    }
+                    return [url('/storage/media/' . $filename), $relative];
+                }
+
+                // Move file in public disk
+                if (Storage::disk('public')->exists($src)) {
+                    if (!Storage::disk('public')->exists($dest)) {
+                        Storage::disk('public')->move($src, $dest);
+                    }
+                }
+
+                $relative = '/media/' . $filename; // media table path
+                if (!Media::where('url', $relative)->exists()) {
+                    Media::create([
+                        'url' => $relative,
+                        'type' => 'image',
+                        'title' => $filename,
+                        'mediable_id' => null,
+                        'mediable_type' => null,
+                    ]);
+                }
+                $publicUrl = url('/storage/media/' . $filename);
+                return [ $publicUrl, $relative ];
+            };
+
+            // Normalize poster URLs to /storage/media/* and save to media table
+            [ $thumbPublic ] = $processMediaUrl($request->thumbnail_url);
+            [ $posterPublic ] = $processMediaUrl($request->poster_url);
+            [ $posterTvPublic ] = $processMediaUrl($request->poster_tv_url);
+
             // 2. Save Trailer + Posters (new unified table)
             $movie->posterTvDetails()->create([
-                'thumbnail' => $request->thumbnail_url ?? null,
-                'poster' => $request->poster_url ?? null,
-                'poster_tv' => $request->poster_tv_url ?? null,
+                'thumbnail' => $thumbPublic ?? ($request->thumbnail_url ?? null),
+                'poster' => $posterPublic ?? ($request->poster_url ?? null),
+                'poster_tv' => $posterTvPublic ?? ($request->poster_tv_url ?? null),
                 'trailer_url_type' => $request->video_upload_type ?? null,
                 'trailer_url' => $request->video_url_input ?? null,
                 'trailer_file' => $request->video_file_input ?? null,

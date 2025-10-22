@@ -238,27 +238,38 @@ class TmdbController extends Controller
 
             // Process Genres
             $genreIds = [];
+            $genreLabels = [];
             if (isset($movie['genres']) && is_array($movie['genres'])) {
                 foreach ($movie['genres'] as $genreData) {
                         // Try to find existing genre
                         $genre = Genre::where('name', $genreData['name'])->first();
                     
                         if (!$genre) {
-                            // Create new genre with default thumbnail
+                            // Generate default thumbnail URL with full base URL
+                            $thumbnailUrl = url('/assets/dummy-images/no-image.jpg');
+                            
+                            // Create new genre with full base URL thumbnail
                             $genre = Genre::create([
                                 'name' => $genreData['name'],
                                 'description' => 'Auto-imported from TMDB',
-                                'thumbnail' => '/assets/dummy-images/no-image.jpg',
+                                'thumbnail' => $thumbnailUrl,
                                 'status' => 1,
                             ]);
+                        } elseif (!$genre->thumbnail || strpos($genre->thumbnail, 'http') !== 0) {
+                            // Update existing genre thumbnail to full URL format if it's a relative path
+                            if ($genre->thumbnail && strpos($genre->thumbnail, '/') === 0) {
+                                $genre->update(['thumbnail' => url($genre->thumbnail)]);
+                            }
                         }
                     
                     $genreIds[] = $genre->id;
+                    $genreLabels[$genre->id] = $genre->name;
                 }
             }
 
             // Process Directors
             $directorIds = [];
+            $directorLabels = [];
             if (isset($credits['crew']) && is_array($credits['crew'])) {
                 $directors = collect($credits['crew'])->filter(function ($crew) {
                     return $crew['job'] === 'Director';
@@ -269,13 +280,13 @@ class TmdbController extends Controller
                         $director = Director::where('name', $directorData['name'])->first();
                     
                         if (!$director) {
-                            // Download and store director profile image
+                            // Download and store director profile image (returns full base URL)
                             $thumbnailPath = $this->downloadAndStoreImage(
                                 $directorData['profile_path'] ?? null,
                                 'media'
                             );
                         
-                            // Create new director
+                            // Create new director with full base URL thumbnail
                             $director = Director::create([
                                 'name' => $directorData['name'],
                                 'slug' => Str::slug($directorData['name']),
@@ -284,8 +295,8 @@ class TmdbController extends Controller
                                 'bio' => 'Auto-imported from TMDB',
                                 'status' => 1,
                             ]);
-                        } elseif (!$director->thumbnail || $director->thumbnail === '/assets/dummy-images/no-image.jpg') {
-                            // Update existing director's thumbnail if missing
+                        } elseif (!$director->thumbnail || $director->thumbnail === '/assets/dummy-images/no-image.jpg' || strpos($director->thumbnail, 'http') !== 0) {
+                            // Update existing director's thumbnail if missing or relative path
                             $thumbnailPath = $this->downloadAndStoreImage(
                                 $directorData['profile_path'] ?? null,
                                 'media'
@@ -294,11 +305,13 @@ class TmdbController extends Controller
                         }
                     
                     $directorIds[] = $director->id;
+                    $directorLabels[$director->id] = $director->name;
                 }
             }
 
             // Process Actors (Top 10 cast members)
             $actorIds = [];
+            $actorLabels = [];
             if (isset($credits['cast']) && is_array($credits['cast'])) {
                 $topCast = collect($credits['cast'])->take(10);
 
@@ -307,13 +320,13 @@ class TmdbController extends Controller
                         $actor = Actor::where('name', $castData['name'])->first();
                     
                         if (!$actor) {
-                            // Download and store actor profile image
+                            // Download and store actor profile image (returns full base URL)
                             $thumbnailPath = $this->downloadAndStoreImage(
                                 $castData['profile_path'] ?? null,
                                 'media'
                             );
                         
-                            // Create new actor
+                            // Create new actor with full base URL thumbnail
                             $actor = Actor::create([
                                 'name' => $castData['name'],
                                 'slug' => Str::slug($castData['name']),
@@ -322,8 +335,8 @@ class TmdbController extends Controller
                                 'bio' => 'Auto-imported from TMDB',
                                 'status' => 1,
                             ]);
-                        } elseif (!$actor->thumbnail || $actor->thumbnail === '/assets/dummy-images/no-image.jpg') {
-                            // Update existing actor's thumbnail if missing
+                        } elseif (!$actor->thumbnail || $actor->thumbnail === '/assets/dummy-images/no-image.jpg' || strpos($actor->thumbnail, 'http') !== 0) {
+                            // Update existing actor's thumbnail if missing or relative path
                             $thumbnailPath = $this->downloadAndStoreImage(
                                 $castData['profile_path'] ?? null,
                                 'media'
@@ -332,6 +345,7 @@ class TmdbController extends Controller
                         }
                     
                     $actorIds[] = $actor->id;
+                    $actorLabels[$actor->id] = $actor->name;
                 }
             }
 
@@ -349,11 +363,17 @@ class TmdbController extends Controller
             // Map country codes to IDs using the mapping method
             $countryMap = $this->getCountryMapping();
             $countryIds = [];
+            $countryLabels = [];
             if (isset($movie['production_countries']) && is_array($movie['production_countries'])) {
                 foreach ($movie['production_countries'] as $country) {
                     $code = $country['iso_3166_1'] ?? '';
                     if (isset($countryMap[$code])) {
-                        $countryIds[] = $countryMap[$code];
+                        $id = $countryMap[$code];
+                        $countryIds[] = $id;
+                        // Use TMDB country name as label
+                        if (!empty($country['name'])) {
+                            $countryLabels[$id] = $country['name'];
+                        }
                     }
                 }
             }
@@ -398,6 +418,12 @@ class TmdbController extends Controller
                     'director_ids' => $directorIds,
                     'actor_ids' => $actorIds,
                     'country_ids' => $countryIds,
+                ],
+                'related_labels' => [
+                    'genres' => $genreLabels,
+                    'directors' => $directorLabels,
+                    'actors' => $actorLabels,
+                    'countries' => $countryLabels,
                 ],
                 'image_paths' => [
                     'thumbnail' => $thumbnailPath,

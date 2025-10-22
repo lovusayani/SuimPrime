@@ -51,7 +51,7 @@
             @include('admin.movies.partials.subtitles')
             @include('admin.movies.partials.seo')
             <div class="d-flex justify-content-end mt-3">
-                <button type="submit" class="btn btn-primary">Save Movie</button>
+                <button type="submit" class="btn btn-primary" id="submit_movie_btn">Save Movie</button>
             </div>
         </form>
     </div>
@@ -77,11 +77,10 @@
                 const TrailerURLInput = document.getElementById('url_input');
                 const TrailerEmbedInput = document.getElementById('trailer_embed_input_section');
 
-                const trailerUrl = document.getElementById('trailer_url_input'); // your URL input inside url_input
-                const trailerFile = document.querySelector(
-                    'input[name="trailer_file_input"]'); // your file input inside url_file_input
-                const embedInput = document.getElementById(
-                    'trailer_embed_input'); // your embed textarea/input inside trailer_embed_input_section
+                // Correct element IDs for trailer inputs
+                const trailerUrl = document.getElementById('trailer_url'); // URL input inside url_input
+                const trailerFile = document.getElementById('trailer_input'); // visible file text input
+                const embedInput = document.getElementById('trailer_embedded'); // embed textarea
 
                 // First hide all sections
                 TrailerFileInput?.classList.add('d-none');
@@ -469,103 +468,103 @@
         </script>
         <script type="text/javascript">
             /* document.addEventListener('DOMContentLoaded', function() {
-                                                                                                const form = document.getElementById('form-submit');
-                                                                                                const submitButton = document.getElementById('submit-button');
-                                                                                                const seoCheckbox = document.getElementById('enableSeoIntegration');
-                                                                                                const metaTitle = document.getElementById('meta_title');
-                                                                                                const metaTitleError = document.getElementById('meta_title_error');
-                                                                                                const hiddenInputsContainer = document.getElementById('meta_keywords_hidden_inputs');
-                                                                                                const errorMsg = document.getElementById('meta_keywords_error');
-                                                                                                const tagifyInput = document.getElementById('meta_keywords_input');
-                                                                                                const tagifyWrapper = tagifyInput ? tagifyInput.closest('.tagify') : null;
-                                                                                                const keywordInputs = hiddenInputsContainer ? hiddenInputsContainer.querySelectorAll(
-                                                                                                    'input[name="meta_keywords[]"]') : [];
-                                                                                                const googleVerification = document.getElementById('google_site_verification');
-                                                                                                const canonicalUrl = document.getElementById('canonical_url');
-                                                                                                const shortDescription = document.getElementById('short_description');
-                                                                                                const seoImage = document.getElementById('seo_image');
-                                                                                                const seoImagePreview = document.getElementById('selectedSeoImage');
-                                                                                                const seoImageError = document.querySelector('#seo_image_input + .invalid-feedback');
+                                                                                                                                                                                                const form = document.getElementById('form-submit');
+                                                                                                                                                                                                const submitButton = document.getElementById('submit-button');
+                                                                                                                                                                                                const seoCheckbox = document.getElementById('enableSeoIntegration');
+                                                                                                                                                                                                const metaTitle = document.getElementById('meta_title');
+                                                                                                                                                                                                const metaTitleError = document.getElementById('meta_title_error');
+                                                                                                                                                                                                const hiddenInputsContainer = document.getElementById('meta_keywords_hidden_inputs');
+                                                                                                                                                                                                const errorMsg = document.getElementById('meta_keywords_error');
+                                                                                                                                                                                                const tagifyInput = document.getElementById('meta_keywords_input');
+                                                                                                                                                                                                const tagifyWrapper = tagifyInput ? tagifyInput.closest('.tagify') : null;
+                                                                                                                                                                                                const keywordInputs = hiddenInputsContainer ? hiddenInputsContainer.querySelectorAll(
+                                                                                                                                                                                                    'input[name="meta_keywords[]"]') : [];
+                                                                                                                                                                                                const googleVerification = document.getElementById('google_site_verification');
+                                                                                                                                                                                                const canonicalUrl = document.getElementById('canonical_url');
+                                                                                                                                                                                                const shortDescription = document.getElementById('short_description');
+                                                                                                                                                                                                const seoImage = document.getElementById('seo_image');
+                                                                                                                                                                                                const seoImagePreview = document.getElementById('selectedSeoImage');
+                                                                                                                                                                                                const seoImageError = document.querySelector('#seo_image_input + .invalid-feedback');
 
-                                                                                                const metaKeywordsError = document.getElementById('meta_keywords_error');
-                                                                                                let formSubmitted = false;
-                                                                                                if (form) {
-                                                                                                    const requiredFields = form.querySelectorAll('[required]');
-                                                                                                    if (requiredFields.length > 0) {
-                                                                                                        requiredFields.forEach(field => {
-                                                                                                            field.addEventListener('input', () => validateField(field));
-                                                                                                            field.addEventListener('change', () => validateField(field));
-                                                                                                        });
-                                                                                                    }
-                                                                                                    form.addEventListener('submit', function(event) {
-                                                                                                        if (formSubmitted) {
-                                                                                                            event.preventDefault();
-                                                                                                            return;
-                                                                                                        }
+                                                                                                                                                                                                const metaKeywordsError = document.getElementById('meta_keywords_error');
+                                                                                                                                                                                                let formSubmitted = false;
+                                                                                                                                                                                                if (form) {
+                                                                                                                                                                                                    const requiredFields = form.querySelectorAll('[required]');
+                                                                                                                                                                                                    if (requiredFields.length > 0) {
+                                                                                                                                                                                                        requiredFields.forEach(field => {
+                                                                                                                                                                                                            field.addEventListener('input', () => validateField(field));
+                                                                                                                                                                                                            field.addEventListener('change', () => validateField(field));
+                                                                                                                                                                                                        });
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                    form.addEventListener('submit', function(event) {
+                                                                                                                                                                                                        if (formSubmitted) {
+                                                                                                                                                                                                            event.preventDefault();
+                                                                                                                                                                                                            return;
+                                                                                                                                                                                                        }
 
-                                                                                                        let isValid = validateForm();
+                                                                                                                                                                                                        let isValid = validateForm();
 
-                                                                                                        if (seoCheckbox && seoCheckbox.checked) {
-                                                                                                            if (!validateSeoImage()) {
-                                                                                                                event.preventDefault(); // stop form submit
-                                                                                                            }
-                                                                                                            if (metaTitle && metaTitle.value === '') {
-                                                                                                                isValid = false;
-                                                                                                                metaTitle.classList.add('is-invalid');
-                                                                                                                if (metaTitleError) metaTitleError.style.display = 'block';
-                                                                                                            } else if (metaTitle) {
-                                                                                                                metaTitle.classList.remove('is-invalid');
-                                                                                                                if (metaTitleError) metaTitleError.style.display = 'none';
-                                                                                                            }
-                                                                                                            // Tagify validation: check if it has tags
-                                                                                                            if (tagifyInput && tagifyInput.value === '') {
-                                                                                                                if (keywordInputs.length === 0) {
-                                                                                                                    isValid = false;
+                                                                                                                                                                                                        if (seoCheckbox && seoCheckbox.checked) {
+                                                                                                                                                                                                            if (!validateSeoImage()) {
+                                                                                                                                                                                                                event.preventDefault(); // stop form submit
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                            if (metaTitle && metaTitle.value === '') {
+                                                                                                                                                                                                                isValid = false;
+                                                                                                                                                                                                                metaTitle.classList.add('is-invalid');
+                                                                                                                                                                                                                if (metaTitleError) metaTitleError.style.display = 'block';
+                                                                                                                                                                                                            } else if (metaTitle) {
+                                                                                                                                                                                                                metaTitle.classList.remove('is-invalid');
+                                                                                                                                                                                                                if (metaTitleError) metaTitleError.style.display = 'none';
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                            // Tagify validation: check if it has tags
+                                                                                                                                                                                                            if (tagifyInput && tagifyInput.value === '') {
+                                                                                                                                                                                                                if (keywordInputs.length === 0) {
+                                                                                                                                                                                                                    isValid = false;
 
-                                                                                                                    // Show error message
-                                                                                                                    if (errorMsg) errorMsg.style.display = 'block';
+                                                                                                                                                                                                                    // Show error message
+                                                                                                                                                                                                                    if (errorMsg) errorMsg.style.display = 'block';
 
-                                                                                                                    // Add visual error indication to Tagify input
-                                                                                                                    if (tagifyWrapper) {
-                                                                                                                        tagifyWrapper.classList.add('is-invalid');
-                                                                                                                    }
-                                                                                                                } else {
-                                                                                                                    const tagifyInputValue = tagifyInput.value;
-                                                                                                                    const keywordValues = tagifyInputValue.map(item => item.value);
-                                                                                                                    const metaKeywordsInput = document.getElementById('meta_keywords_input');
-                                                                                                                    if (metaKeywordsInput) metaKeywordsInput.value = JSON.stringify(
-                                                                                                                        keywordValues);
-                                                                                                                    // Hide error if input is valid
-                                                                                                                    if (errorMsg) errorMsg.style.display = 'none';
-                                                                                                                    if (tagifyWrapper) {
-                                                                                                                        tagifyWrapper.classList.remove('is-invalid');
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            } else if (tagifyInput) {
-                                                                                                                if (errorMsg) errorMsg.style.display = 'none';
-                                                                                                                if (tagifyWrapper) {
-                                                                                                                    tagifyWrapper.classList.remove('is-invalid');
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-
-
+                                                                                                                                                                                                                    // Add visual error indication to Tagify input
+                                                                                                                                                                                                                    if (tagifyWrapper) {
+                                                                                                                                                                                                                        tagifyWrapper.classList.add('is-invalid');
+                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                } else {
+                                                                                                                                                                                                                    const tagifyInputValue = tagifyInput.value;
+                                                                                                                                                                                                                    const keywordValues = tagifyInputValue.map(item => item.value);
+                                                                                                                                                                                                                    const metaKeywordsInput = document.getElementById('meta_keywords_input');
+                                                                                                                                                                                                                    if (metaKeywordsInput) metaKeywordsInput.value = JSON.stringify(
+                                                                                                                                                                                                                        keywordValues);
+                                                                                                                                                                                                                    // Hide error if input is valid
+                                                                                                                                                                                                                    if (errorMsg) errorMsg.style.display = 'none';
+                                                                                                                                                                                                                    if (tagifyWrapper) {
+                                                                                                                                                                                                                        tagifyWrapper.classList.remove('is-invalid');
+                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                }
+                                                                                                                                                                                                            } else if (tagifyInput) {
+                                                                                                                                                                                                                if (errorMsg) errorMsg.style.display = 'none';
+                                                                                                                                                                                                                if (tagifyWrapper) {
+                                                                                                                                                                                                                    tagifyWrapper.classList.remove('is-invalid');
+                                                                                                                                                                                                                }
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                        }
 
 
 
-                                                                                                        if (!isValid) {
-                                                                                                            event.preventDefault();
-                                                                                                            submitButton.disabled = false;
-                                                                                                            formSubmitted = false; // Reset the flag
-                                                                                                            return;
-                                                                                                        }
 
-                                                                                                        submitButton.disabled = true;
-                                                                                                        submitButton.innerText = 'Loading...';
-                                                                                                        formSubmitted = true;
-                                                                                                    });
-                                                                                                }
-                                                                                            }); */
+
+                                                                                                                                                                                                        if (!isValid) {
+                                                                                                                                                                                                            event.preventDefault();
+                                                                                                                                                                                                            submitButton.disabled = false;
+                                                                                                                                                                                                            formSubmitted = false; // Reset the flag
+                                                                                                                                                                                                            return;
+                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                        submitButton.disabled = true;
+                                                                                                                                                                                                        submitButton.innerText = 'Loading...';
+                                                                                                                                                                                                        formSubmitted = true;
+                                                                                                                                                                                                    });
+                                                                                                                                                                                                }
+                                                                                                                                                                                            }); */
             document.addEventListener('DOMContentLoaded', function() {
                 flatpickr('.min-datetimepicker-time', {
                     enableTime: true,
@@ -1166,27 +1165,90 @@
                                 }).length > 0) {
                                 $('#language').val(mapped).trigger('change');
                             }
-                            // Multi-selects
-                            if (Array.isArray(related.genre_ids)) $('#genres').val(related
-                                .genre_ids).trigger('change');
-                            if (Array.isArray(related.actor_ids)) $('#actors').val(related
-                                .actor_ids).trigger('change');
-                            if (Array.isArray(related.director_ids)) $('#directors').val(related
-                                .director_ids).trigger('change');
-                            if (Array.isArray(related.country_ids) && related.country_ids.length >
-                                0) {
-                                $('#countries').val(related.country_ids).trigger('change');
-                            }
+                            // Multi-selects: ensure options exist before selecting
+                            const labels = resp.related_labels || {};
+                            const ensureOptions = (selectId, map) => {
+                                if (!map) return;
+                                const $sel = $(selectId);
+                                Object.entries(map).forEach(([id, name]) => {
+                                    if ($sel.find(`option[value="${id}"]`).length ===
+                                        0) {
+                                        const opt = new Option(name, id, false, false);
+                                        $sel.append(opt);
+                                    }
+                                });
+                                // If using select2, trigger an update
+                                if (typeof $.fn.select2 === 'function') {
+                                    $sel.trigger('change');
+                                }
+                            };
+
+                            ensureOptions('#genres', labels.genres);
+                            ensureOptions('#actors', labels.actors);
+                            ensureOptions('#directors', labels.directors);
+                            ensureOptions('#countries', labels.countries);
+
+                            const applySelect2Values = (selector, ids, labelMap) => {
+                                if (!Array.isArray(ids) || ids.length === 0) return;
+                                const $sel = $(selector);
+                                const idsStr = ids.map(v => v.toString());
+
+                                // Ensure options exist first
+                                idsStr.forEach(id => {
+                                    if ($sel.find(`option[value="${id}"]`).length ===
+                                        0) {
+                                        const name = (labelMap && labelMap[id]) || id;
+                                        $sel.append(new Option(name, id, false, false));
+                                    }
+                                });
+
+                                // Destroy and recreate Select2 with selected values for reliable chip rendering
+                                if (typeof $.fn.select2 === 'function' && $sel.hasClass(
+                                        'select2-hidden-accessible')) {
+                                    $sel.select2('destroy');
+                                    $sel.val(idsStr); // Set values before re-init
+                                    $sel.select2({
+                                        width: '100%',
+                                        placeholder: $sel.data('placeholder') ||
+                                            'Select an option',
+                                        allowClear: true
+                                    });
+                                } else {
+                                    // Fallback if Select2 not initialized yet
+                                    $sel.val(idsStr).trigger('change');
+                                }
+                            };
+
+                            applySelect2Values('#genres', related.genre_ids || [], labels.genres ||
+                            {});
+                            applySelect2Values('#actors', related.actor_ids || [], labels.actors ||
+                            {});
+                            applySelect2Values('#directors', related.director_ids || [], labels
+                                .directors || {});
+                            applySelect2Values('#countries', related.country_ids || [], labels
+                                .countries || {});
 
                             // Trailer data
                             if (resp.trailer && resp.trailer.url) {
                                 const trailer = resp.trailer;
+
                                 // Set trailer type to YouTube
                                 $('#trailer_url_type').val('YouTube').trigger('change');
-                                // Wait a moment for the visibility logic to complete, then set URL
-                                setTimeout(function() {
-                                    $('#trailer_url').val(trailer.url);
-                                }, 100);
+
+                                // Explicitly show only the URL input section and hide others
+                                $('#url_input').removeClass('d-none');
+                                $('#url_file_input').addClass('d-none');
+                                $('#trailer_embed_input_section').addClass('d-none');
+
+                                // Set required attribute on trailer URL input
+                                $('#trailer_url').attr('required', 'required');
+
+                                // Remove required from other inputs
+                                $('#trailer_input').removeAttr('required');
+                                $('#trailer_embedded').removeAttr('required');
+
+                                // Set the trailer URL value
+                                $('#trailer_url').val(trailer.url);
                             }
 
                             // Images - Update both hidden input and visible preview
@@ -1212,6 +1274,53 @@
                                 $('#poster_tv_input').val(tv);
                                 $('#selectedPosterTvImage').attr('src', tv).css('display', 'block');
                                 $('#selectedImageContainerPosterTv').show();
+                            }
+
+                            // Auto-fill SEO Settings
+                            const movieName = tmdb.title || '';
+
+                            // SEO Image = thumbnail
+                            if (thumb) {
+                                $('#seo_image').val(thumb);
+                                $('#seo_image_input').val(thumb);
+                                $('#selectedSeoImage').attr('src', thumb).css('display', 'block');
+                                $('#selectedImageContainerSeo').show();
+                            }
+
+                            // Meta Title = name
+                            if (movieName) {
+                                $('#meta_title').val(movieName);
+                            }
+
+                            // Meta Keywords = name + genres (e.g., "Tron Action, Tron Comedy")
+                            if (movieName && labels.genres) {
+                                const genreNames = Object.values(labels.genres);
+                                const keywords = genreNames.map(g => `${movieName} ${g}`).join(
+                                    ', ');
+                                $('#meta_keywords_input').val(keywords);
+                            }
+
+                            // Google Site Verification = random number
+                            const randomVerification = Math.random().toString(36).substring(2, 15) +
+                                Math.random().toString(36).substring(2, 15);
+                            $('#google_site_verification').val(randomVerification);
+
+                            // Canonical URL = baseurl + / + name (slugified)
+                            if (movieName) {
+                                const baseUrl = window.location.origin;
+                                const slug = movieName.toLowerCase()
+                                    .replace(/[^a-z0-9]+/g, '-')
+                                    .replace(/^-+|-+$/g, '');
+                                $('#canonical_url').val(`${baseUrl}/${slug}`);
+                            }
+
+                            // Ensure SEO toggle is enabled and fields visible
+                            const $seoToggle = $('#enableSeoIntegration');
+                            if ($seoToggle.length) {
+                                $seoToggle.prop('checked', true);
+                                if (typeof toggleSeoFields === 'function') {
+                                    toggleSeoFields();
+                                }
                             }
 
                             window.successSnackbar ? window.successSnackbar('TMDB data imported') :
@@ -1243,8 +1352,10 @@
                         formData.set('description', tinymce.get('description').getContent());
                     }
 
-                    // Show loading state
-                    $('#submit-button').prop('disabled', true).html(
+                    // Show loading state (support legacy #submit-button or new #submit_movie_btn)
+                    const $submitBtn = $('#submit-button').length ? $('#submit-button') : $(
+                        '#submit_movie_btn');
+                    $submitBtn.prop('disabled', true).html(
                         '<span class="spinner-border spinner-border-sm"></span> Saving...'
                     );
 
@@ -1272,11 +1383,11 @@
                                 $('#error_message')
                                     .text(response.message || 'Something went wrong')
                                     .show();
-                                $('#submit-button').prop('disabled', false).html('Save');
+                                $submitBtn.prop('disabled', false).html('Save');
                             }
                         },
                         error: function(xhr) {
-                            $('#submit-button').prop('disabled', false).html('Save');
+                            $submitBtn.prop('disabled', false).html('Save');
 
                             if (xhr.responseJSON?.errors) {
                                 // Loop through validation errors
