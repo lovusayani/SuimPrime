@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Setting;
+use App\Models\Currency;
 use Illuminate\Support\Str;
 
 class SettingsController extends Controller
@@ -74,6 +75,277 @@ class SettingsController extends Controller
     {
         // If you store payment settings in DB, load them here and pass to the view.
         return view('admin.settings.payment-method');
+    }
+
+    public function updatePaymentMethod(Request $request)
+    {
+        // Payment methods toggles and credentials
+        $paymentMethods = [
+            'razor_payment_method', 'razorpay_secretkey', 'razorpay_publickey',
+            'str_payment_method', 'stripe_secretkey', 'stripe_publickey',
+            'paystack_payment_method', 'paystack_secretkey', 'paystack_publickey',
+            'paypal_payment_method', 'paypal_secretkey', 'paypal_clientid',
+            'flutterwave_payment_method', 'flutterwave_secretkey', 'flutterwave_publickey',
+            'cinet_payment_method', 'cinet_siteid', 'cinet_api_key', 'cinet_Secret_key',
+            'sadad_payment_method', 'sadad_Sadadkey', 'sadad_id_key', 'sadad_Domain',
+            'airtel_payment_method', 'airtel_money_secretkey', 'airtel_money_client_id',
+            'phonepe_payment_method', 'phonepe_App_id', 'phonepe_Merchant_id', 'phonepe_salt_key', 'phonepe_salt_index',
+            'midtrans_payment_method', 'midtrans_client_id', 'midtrans_server_key',
+            'iap_payment_method', 'entertainment_id', 'apple_api_key', 'google_api_key',
+        ];
+
+        foreach ($paymentMethods as $key) {
+            // For toggle fields (checkboxes)
+            if (str_ends_with($key, '_payment_method')) {
+                Setting::set($key, $request->has($key) ? '1' : '0');
+            } else {
+                // For text fields
+                Setting::set($key, $request->input($key, ''));
+            }
+        }
+
+        return redirect()->route('admin.settings.paymentMethod')->with('success', 'Payment methods updated successfully.');
+    }
+
+    public function languageSettings()
+    {
+        return view('admin.settings.language-settings');
+    }
+
+    public function loadLanguageKeys(Request $request)
+    {
+        $languageId = $request->input('language_id');
+        $fileId = $request->input('file_id');
+
+        if (!$languageId || !$fileId) {
+            return response()->json(['success' => false, 'message' => 'Invalid parameters']);
+        }
+
+        // Path to the language file
+        $langPath = resource_path("lang/{$languageId}/{$fileId}.php");
+
+        if (!file_exists($langPath)) {
+            return response()->json(['success' => false, 'message' => 'Language file not found', 'data' => []]);
+        }
+
+        // Load the translation keys
+        $translations = include $langPath;
+
+        return response()->json(['success' => true, 'data' => $translations]);
+    }
+
+    public function updateLanguageSettings(Request $request)
+    {
+        $request->validate([
+            'language_id' => 'required|string',
+            'file_id' => 'required|string',
+            'lang_data' => 'required|array',
+        ]);
+
+        $languageId = $request->input('language_id');
+        $fileId = $request->input('file_id');
+        $langData = $request->input('lang_data');
+
+        // Create language directory if it doesn't exist
+        $langDir = resource_path("lang/{$languageId}");
+        if (!file_exists($langDir)) {
+            mkdir($langDir, 0755, true);
+        }
+
+        // Path to the language file
+        $langPath = resource_path("lang/{$languageId}/{$fileId}.php");
+
+        // Prepare the content
+        $content = "<?php\n\nreturn [\n";
+        foreach ($langData as $key => $value) {
+            $key = addslashes($key);
+            $value = addslashes($value);
+            $content .= "    '{$key}' => '{$value}',\n";
+        }
+        $content .= "];\n";
+
+        // Write to file
+        file_put_contents($langPath, $content);
+
+        return redirect()->route('admin.settings.languageSettings')->with('success', 'Language translations updated successfully.');
+    }
+
+    public function notificationConfiguration()
+    {
+        return view('admin.settings.notification-configuration');
+    }
+
+    public function updateNotificationConfiguration(Request $request)
+    {
+        $request->validate([
+            'expiry_plan' => 'required|numeric|min:0',
+            'upcoming' => 'required|numeric|min:0',
+            'continue_watch' => 'required|numeric|min:0',
+        ]);
+
+        Setting::set('expiry_plan', $request->input('expiry_plan'));
+        Setting::set('upcoming', $request->input('upcoming'));
+        Setting::set('continue_watch', $request->input('continue_watch'));
+
+        return redirect()->route('admin.settings.notificationConfiguration')->with('success', 'Notification configuration updated successfully.');
+    }
+
+    public function currencySettings()
+    {
+        $currencies = Currency::orderBy('is_primary', 'desc')->orderBy('id', 'asc')->get();
+        return view('admin.settings.currency-settings', compact('currencies'));
+    }
+
+    public function storeCurrency(Request $request)
+    {
+        $request->validate([
+            'currency_name' => 'required|string|max:255',
+            'currency_symbol' => 'required|string|max:10',
+            'currency_code' => 'required|string|max:10',
+            'currency_position' => 'required|string',
+            'thousand_separator' => 'required|string|max:5',
+            'decimal_separator' => 'required|string|max:5',
+            'no_of_decimal' => 'required|integer|min:0',
+        ]);
+
+        // If this currency is set as primary, unset all other primary currencies
+        if ($request->has('is_primary')) {
+            Currency::where('is_primary', true)->update(['is_primary' => false]);
+        }
+
+        Currency::create([
+            'currency_name' => $request->currency_name,
+            'currency_symbol' => $request->currency_symbol,
+            'currency_code' => $request->currency_code,
+            'is_primary' => $request->has('is_primary'),
+            'currency_position' => $request->currency_position,
+            'thousand_separator' => $request->thousand_separator,
+            'decimal_separator' => $request->decimal_separator,
+            'no_of_decimal' => $request->no_of_decimal,
+        ]);
+
+        return redirect()->route('admin.settings.currencySettings')->with('success', 'Currency added successfully.');
+    }
+
+    public function editCurrency($id)
+    {
+        $currency = Currency::findOrFail($id);
+        return response()->json($currency);
+    }
+
+    public function updateCurrency(Request $request, $id)
+    {
+        $currency = Currency::findOrFail($id);
+
+        $request->validate([
+            'currency_name' => 'required|string|max:255',
+            'currency_symbol' => 'required|string|max:10',
+            'currency_code' => 'required|string|max:10',
+            'currency_position' => 'required|string',
+            'thousand_separator' => 'required|string|max:5',
+            'decimal_separator' => 'required|string|max:5',
+            'no_of_decimal' => 'required|integer|min:0',
+        ]);
+
+        // If this currency is set as primary, unset all other primary currencies
+        if ($request->has('is_primary')) {
+            Currency::where('id', '!=', $id)->where('is_primary', true)->update(['is_primary' => false]);
+        }
+
+        $currency->update([
+            'currency_name' => $request->currency_name,
+            'currency_symbol' => $request->currency_symbol,
+            'currency_code' => $request->currency_code,
+            'is_primary' => $request->has('is_primary'),
+            'currency_position' => $request->currency_position,
+            'thousand_separator' => $request->thousand_separator,
+            'decimal_separator' => $request->decimal_separator,
+            'no_of_decimal' => $request->no_of_decimal,
+        ]);
+
+        return redirect()->route('admin.settings.currencySettings')->with('success', 'Currency updated successfully.');
+    }
+
+    public function destroyCurrency($id)
+    {
+        $currency = Currency::findOrFail($id);
+        
+        // Don't allow deletion of primary currency
+        if ($currency->is_primary) {
+            return redirect()->route('admin.settings.currencySettings')->with('error', 'Cannot delete primary currency.');
+        }
+
+        $currency->delete();
+
+        return redirect()->route('admin.settings.currencySettings')->with('success', 'Currency deleted successfully.');
+    }
+
+    public function storageSettings()
+    {
+        return view('admin.settings.storage-settings');
+    }
+
+    public function updateStorageSettings(Request $request)
+    {
+        // Validate S3 fields if S3 is enabled
+        if ($request->has('s3') && $request->input('s3') == '1') {
+            $request->validate([
+                'aws_access_key' => 'required|string',
+                'aws_secret_key' => 'required|string',
+                'aws_region' => 'required|string',
+                'aws_bucket' => 'required|string',
+                'aws_path_style' => 'required|string',
+            ]);
+        }
+
+        // Save storage settings
+        Setting::set('local', $request->has('local') ? '1' : '0');
+        Setting::set('s3', $request->has('s3') ? '1' : '0');
+
+        // Save AWS S3 settings if S3 is enabled
+        if ($request->has('s3') && $request->input('s3') == '1') {
+            Setting::set('aws_access_key', $request->input('aws_access_key', ''));
+            Setting::set('aws_secret_key', $request->input('aws_secret_key', ''));
+            Setting::set('aws_region', $request->input('aws_region', ''));
+            Setting::set('aws_bucket', $request->input('aws_bucket', ''));
+            Setting::set('aws_path_style', $request->input('aws_path_style', 'false'));
+        }
+
+        return redirect()->route('admin.settings.storageSettings')->with('success', 'Storage settings updated successfully.');
+    }
+
+    public function seoSettings()
+    {
+        return view('admin.settings.seo-settings');
+    }
+
+    public function updateSeoSettings(Request $request)
+    {
+        $request->validate([
+            'meta_title' => 'required|string|max:100',
+            'google_site_verification' => 'required|string',
+            'meta_keywords' => 'required|string',
+            'canonical_url' => 'required|url',
+            'short_description' => 'required|string|max:200',
+            'seo_image_file' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
+        ]);
+
+        // Handle SEO image upload
+        if ($request->hasFile('seo_image_file')) {
+            $file = $request->file('seo_image_file');
+            $filename = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/seo', $filename, 'public');
+            Setting::set('seo_image', '/storage/' . $path);
+        }
+
+        // Save SEO settings
+        Setting::set('meta_title', $request->input('meta_title'));
+        Setting::set('google_site_verification', $request->input('google_site_verification'));
+        Setting::set('meta_keywords', $request->input('meta_keywords'));
+        Setting::set('canonical_url', $request->input('canonical_url'));
+        Setting::set('short_description', $request->input('short_description'));
+
+        return redirect()->route('admin.settings.seoSettings')->with('success', 'SEO settings updated successfully.');
     }
 
     public function update(Request $request)

@@ -111,6 +111,28 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/settings/mail', [SettingsController::class, 'mail'])->name('admin.settings.mail');
     Route::get('/settings/notification', [SettingsController::class, 'notification'])->name('admin.settings.notification');
     Route::get('/settings/payment-method', [SettingsController::class, 'paymentMethod'])->name('admin.settings.paymentMethod');
+    Route::post('/settings/payment-method', [SettingsController::class, 'updatePaymentMethod'])->name('admin.settings.payment.update');
+    Route::get('/settings/language-settings', [SettingsController::class, 'languageSettings'])->name('admin.settings.languageSettings');
+    Route::post('/settings/language-settings', [SettingsController::class, 'updateLanguageSettings'])->name('admin.settings.language.update');
+    Route::get('/settings/language-load', [SettingsController::class, 'loadLanguageKeys'])->name('admin.settings.language.load');
+    Route::get('/settings/notification-configuration', [SettingsController::class, 'notificationConfiguration'])->name('admin.settings.notificationConfiguration');
+    Route::post('/settings/notification-configuration', [SettingsController::class, 'updateNotificationConfiguration'])->name('admin.settings.notificationConfig.update');
+    Route::get('/settings/currency-settings', [SettingsController::class, 'currencySettings'])->name('admin.settings.currencySettings');
+    Route::post('/settings/currency-settings', [SettingsController::class, 'storeCurrency'])->name('admin.settings.currency.store');
+    Route::get('/settings/currency-settings/{id}/edit', [SettingsController::class, 'editCurrency'])->name('admin.settings.currency.edit');
+    Route::put('/settings/currency-settings/{id}', [SettingsController::class, 'updateCurrency'])->name('admin.settings.currency.update');
+    Route::delete('/settings/currency-settings/{id}', [SettingsController::class, 'destroyCurrency'])->name('admin.settings.currency.destroy');
+    Route::get('/settings/storage-settings', [SettingsController::class, 'storageSettings'])->name('admin.settings.storageSettings');
+    Route::post('/settings/storage-settings', [SettingsController::class, 'updateStorageSettings'])->name('admin.settings.storage.update');
+    Route::get('/settings/seo-settings', [SettingsController::class, 'seoSettings'])->name('admin.settings.seoSettings');
+    Route::post('/settings/seo-settings', [SettingsController::class, 'updateSeoSettings'])->name('admin.settings.seo.update');
+
+    // TMDB Routes
+    Route::get('/tmdb', [\App\Http\Controllers\Admin\TmdbController::class, 'index'])->name('admin.tmdb.index');
+    Route::post('/tmdb/search', [\App\Http\Controllers\Admin\TmdbController::class, 'search'])->name('admin.tmdb.search');
+    Route::post('/tmdb/fetch', [\App\Http\Controllers\Admin\TmdbController::class, 'fetch'])->name('admin.tmdb.fetch');
+    Route::delete('/tmdb/{id}', [\App\Http\Controllers\Admin\TmdbController::class, 'destroy'])->name('admin.tmdb.destroy');
+    Route::post('/tmdb/filter', [\App\Http\Controllers\Admin\TmdbController::class, 'filter'])->name('admin.tmdb.filter');
 });
 
 Route::post('/clear-cache-config', function () {
