@@ -70,6 +70,12 @@ class SettingsController extends Controller
         return view('admin.settings.notification');
     }
 
+    public function paymentMethod()
+    {
+        // If you store payment settings in DB, load them here and pass to the view.
+        return view('admin.settings.payment-method');
+    }
+
     public function update(Request $request)
     {
         // handle simple text inputs

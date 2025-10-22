@@ -110,6 +110,7 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/settings/misc', [SettingsController::class, 'misc'])->name('admin.settings.misc');
     Route::get('/settings/mail', [SettingsController::class, 'mail'])->name('admin.settings.mail');
     Route::get('/settings/notification', [SettingsController::class, 'notification'])->name('admin.settings.notification');
+    Route::get('/settings/payment-method', [SettingsController::class, 'paymentMethod'])->name('admin.settings.paymentMethod');
 });
 
 Route::post('/clear-cache-config', function () {

@@ -43,7 +43,7 @@
                     </a>
                 </div>
                 <div class="mb-3 active-menu">
-                    <a id="link-payment-method" href="{{ route('admin.settings.logo', ['section' => 'payment-method']) }}" class="btn btn-border {{ $section === 'payment-method' ? 'active' : '' }}">
+                    <a id="link-payment-method" href="{{ route('admin.settings.paymentMethod') }}" class="btn btn-border {{ request()->routeIs('admin.settings.paymentMethod') ? 'active' : ($section === 'payment-method' ? 'active' : '') }}">
                         <i class="fa-solid fa-coins"></i>Payment Method
                     </a>
                 </div>
