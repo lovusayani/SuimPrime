@@ -180,7 +180,7 @@
                         </li>
                     </ul>
                 </li>
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a href="#ads" data-bs-parent="#sidebar-menu" class="nav-link" data-bs-toggle="collapse"
                         role="button" aria-expanded="false" aria-controls="collapseExample" href="">
                         <i class='icon ph ph-megaphone' data-bs-toggle="tooltip" data-bs-placement="right"
@@ -364,7 +364,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#/app/setting/general-setting">
+                    <a class="nav-link" href="{{ route('admin.settings.logo') }}">
                         <i class='icon ph ph-gear-six' data-bs-toggle="tooltip" data-bs-placement="right"
                             aria-label="Settings" data-bs-original-title="Settings"></i><span
                             class='item-name'>Settings</span><i class='icon '></i>
@@ -390,7 +390,7 @@
                             aria-label="FAQ" data-bs-original-title="FAQ"></i><span class='item-name'>FAQ</span><i
                             class='icon '></i>
                     </a>
-                </li> --}}
+                </li>
             </ul>
         </div>
     </div>

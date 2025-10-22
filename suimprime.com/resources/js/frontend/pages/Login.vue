@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import axios from "../axios";
+import axios, { setAuthToken } from "../axios";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -150,15 +150,36 @@ const login = async () => {
         await axios.get("/sanctum/csrf-cookie");
 
         // Step 2: Submit login to API login route
-        const res = await axios.post("/api/login", {
+        // Note: backend routes are registered at '/login' (no /api prefix in this app)
+        const res = await axios.post("/login", {
             email: email.value,
             password: password.value,
         });
         console.log(email);
 
-        // Step 3: Save token or user data if returned
-        // With Sanctum cookie-based auth we don't store token client-side.
-        // Navigate to Home; Home will call /api/me to fetch user via cookie.
+        // Step 3: Save token and user data if returned
+        const returnedToken = res.data?.access_token;
+        if (returnedToken) {
+            setAuthToken(returnedToken);
+        }
+
+        // If the backend returned a user object, persist it so the navbar can show the name
+        const returnedUser = res.data?.user || res.data;
+        if (returnedUser && returnedUser?.id) {
+            try {
+                localStorage.setItem("user", JSON.stringify(returnedUser));
+            } catch (e) {}
+            // Emit an in-page event so Navbar (already mounted) can update immediately
+            try {
+                window.dispatchEvent(
+                    new CustomEvent("auth:login", {
+                        detail: { user: returnedUser },
+                    })
+                );
+            } catch (e) {}
+        }
+
+        // Navigate to Home; Home will call /me to fetch user via cookie or token if necessary.
         router.push({ name: "Home" });
     } catch (err) {
         console.error("Login error:", err);

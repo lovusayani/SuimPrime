@@ -35,14 +35,19 @@ const router = createRouter({
     routes,
 });
 
-// Simple auth guard using token in localStorage
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token');
-    if (to.meta?.requiresAuth && !token) {
+// Token-only auth: rely on stored access_token
+function isAuthenticated() {
+    const token = localStorage.getItem('access_token');
+    return !!token;
+}
+
+router.beforeEach(async (to, from, next) => {
+    const auth = await isAuthenticated();
+    if (to.meta?.requiresAuth && !auth) {
         return next({ name: 'Login' });
     }
     // prevent visiting login when already authenticated
-    if (to.name === 'Login' && token) {
+    if (to.name === 'Login' && auth) {
         return next({ name: 'Home' });
     }
     next();

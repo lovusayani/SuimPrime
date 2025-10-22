@@ -106,6 +106,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/settings/logo', [SettingsController::class, 'edit'])->name('admin.settings.logo');
     Route::post('/settings/logo', [SettingsController::class, 'update'])->name('admin.settings.logo.update');
+    Route::get('/settings/module', [SettingsController::class, 'module'])->name('admin.settings.module');
+    Route::get('/settings/misc', [SettingsController::class, 'misc'])->name('admin.settings.misc');
+    Route::get('/settings/mail', [SettingsController::class, 'mail'])->name('admin.settings.mail');
+    Route::get('/settings/notification', [SettingsController::class, 'notification'])->name('admin.settings.notification');
 });
 
 Route::post('/clear-cache-config', function () {

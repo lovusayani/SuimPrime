@@ -29,4 +29,31 @@ axios.defaults.baseURL = baseURL;
 axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
 axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
 
+// If a token was previously saved (from token-based login), attach it to requests
+if (typeof window !== 'undefined') {
+	try {
+		const token = localStorage.getItem('access_token');
+		if (token) {
+			axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+		}
+	} catch (e) {
+		// access to localStorage might fail in some environments; ignore
+	}
+}
+
+// Helper to set/clear Authorization header at runtime
+export function setAuthToken(token) {
+	if (token) {
+		try {
+			localStorage.setItem('access_token', token);
+		} catch (e) {}
+		axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+	} else {
+		try {
+			localStorage.removeItem('access_token');
+		} catch (e) {}
+		delete axios.defaults.headers.common['Authorization'];
+	}
+}
+
 export default axios;

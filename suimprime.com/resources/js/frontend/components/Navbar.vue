@@ -82,18 +82,23 @@
                     </button>
 
                     <!-- User / Login -->
-                    <div v-if="user" class="dropdown">
+                    <div v-if="user" class="dropdown" ref="userDropdownRef">
                         <button
                             class="btn btn-danger px-3 dropdown-toggle"
                             type="button"
                             id="userMenuButton"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
+                            @click.prevent="
+                                showUserDropdown = !showUserDropdown
+                            "
+                            :aria-expanded="showUserDropdown"
                         >
                             {{ user.name }}
                         </button>
                         <ul
-                            class="dropdown-menu dropdown-menu-end"
+                            :class="[
+                                'dropdown-menu dropdown-menu-end',
+                                { show: showUserDropdown },
+                            ]"
                             aria-labelledby="userMenuButton"
                         >
                             <li>
@@ -150,12 +155,19 @@
                             <button
                                 class="btn btn-primary w-100 py-2 dropdown-toggle"
                                 type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
+                                @click.prevent="
+                                    showUserDropdown = !showUserDropdown
+                                "
+                                :aria-expanded="showUserDropdown"
                             >
                                 {{ user.name }}
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul
+                                :class="[
+                                    'dropdown-menu dropdown-menu-end',
+                                    { show: showUserDropdown },
+                                ]"
+                            >
                                 <li>
                                     <button
                                         class="dropdown-item"
@@ -182,6 +194,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
+import axios, { setAuthToken } from "../axios";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const router = useRouter();
@@ -190,6 +203,10 @@ const mobileMenuOpen = ref(false); // left drawer
 const showSearch = ref(false);
 const searchQuery = ref("");
 const isScrolled = ref(false);
+
+// Dropdown state for user menu
+const showUserDropdown = ref(false);
+const userDropdownRef = ref(null);
 
 // User reactive state
 const user = ref(null);
@@ -200,11 +217,97 @@ onMounted(() => {
     if (storedUser) user.value = JSON.parse(storedUser);
 });
 
-// Logout method
-const logout = () => {
-    localStorage.removeItem("user");
+// If no user in storage, try to fetch from backend (supports cookie or token)
+onMounted(() => {
+    // listen for login events from Login.vue
+    window.addEventListener('auth:login', (ev) => {
+        const u = ev?.detail?.user;
+        if (u) {
+            user.value = u;
+            try {
+                localStorage.setItem('user', JSON.stringify(u));
+            } catch (e) {}
+        }
+    });
+});
+
+// close dropdown when clicking outside
+const handleDocumentClick = (e) => {
+    const el = userDropdownRef?.value;
+    if (!el) return;
+    if (el.contains(e.target)) return;
+    showUserDropdown.value = false;
+};
+
+onMounted(() => {
+    document.addEventListener("click", handleDocumentClick);
+});
+
+onUnmounted(() => {
+    document.removeEventListener("click", handleDocumentClick);
+});
+
+// Logout method: token-first, clear client state immediately, clear cookies as a fallback
+const logout = async () => {
+    // Call server to delete token(s). Axios will attach Authorization header if present.
+    try {
+        await axios.post('/logout', {}, { withCredentials: true });
+    } catch (e) {
+        // Ignore network errors — we'll still clear client state
+        console.warn('Logout request failed', e?.response?.status || e?.message);
+    }
+
+    // Immediately clear client-side token and user so UI updates without reload
+    try { setAuthToken(null); } catch (e) {}
+    try { localStorage.removeItem('access_token'); } catch (e) {}
+    try { localStorage.removeItem('token'); } catch (e) {}
+    try { localStorage.removeItem('user'); } catch (e) {}
+
     user.value = null;
-    router.push({ name: "Login" });
+    showUserDropdown.value = false;
+
+    // As a dev fallback also clear cookies client-side
+    try {
+        const host = window.location.hostname;
+        document.cookie = `suimprime-session=; Path=/; Domain=${host}; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+        document.cookie = `XSRF-TOKEN=; Path=/; Domain=${host}; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+    } catch (e) {}
+
+    try {
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+    } catch (e) {}
+
+    // Navigate to Login immediately (no full reload)
+    router.push({ name: 'Login' });
+
+    // Verify server-side session cleared; if still authenticated, try extra cookie clears and reload
+    try {
+        const me = await axios.get('/me');
+        if (me?.data) {
+            // server still returns a user — attempt more aggressive cookie clearing and reload
+            try {
+                const host = window.location.hostname;
+                // common variants
+                const domains = [host, '.' + host, window.location.hostname.replace(/^www\./, '')];
+                const paths = ['/', ''];
+                for (const d of domains) {
+                    for (const p of paths) {
+                        try {
+                            document.cookie = `suimprime-session=; Path=${p}; Domain=${d}; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+                        } catch (e) {}
+                        try {
+                            document.cookie = `XSRF-TOKEN=; Path=${p}; Domain=${d}; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+                        } catch (e) {}
+                    }
+                }
+            } catch (e) {}
+
+            // force reload to ensure server session state is reflected
+            window.location.reload();
+        }
+    } catch (e) {
+        // expected: 401 or network failure means session cleared
+    }
 };
 
 // Navbar methods

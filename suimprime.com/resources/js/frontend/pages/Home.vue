@@ -99,7 +99,7 @@
 
 <script setup>
 import FrontendLayout from "../components/App.vue";
-import axios from "../axios";
+import axios, { setAuthToken } from "../axios";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -111,12 +111,13 @@ const movies = ref([]);
 
 const fetchMe = async () => {
     try {
-        // Use cookie-based Sanctum session: call API /me
-        const res = await axios.get('/api/me');
-        user.value = res.data;
+        // Use cookie-based Sanctum session: call backend /me
+        const res = await axios.get("/me");
+        // Some backends return the user directly, others wrap it as { user: {...} }
+        user.value = res.data?.user || res.data;
     } catch (err) {
-        console.error('Failed to fetch user:', err);
-        router.push({ name: 'Login' });
+        console.error("Failed to fetch user:", err);
+        router.push({ name: "Login" });
     } finally {
         loading.value = false;
     }
@@ -124,20 +125,28 @@ const fetchMe = async () => {
 
 const fetchMovies = async () => {
     try {
-        const res = await axios.get('/api/admin/videos');
+        const res = await axios.get("/admin/videos");
         movies.value = res.data || [];
     } catch (err) {
-        console.warn('Failed to fetch movies:', err);
+        console.warn("Failed to fetch movies:", err);
     }
 };
 
 const logout = async () => {
     try {
-        await axios.post('/api/logout');
+        await axios.post("/logout");
     } catch (e) {
-        console.warn('Logout request failed, proceeding to clear local session.');
+        console.warn(
+            "Logout request failed, proceeding to clear local session."
+        );
     }
-    router.push({ name: 'Login' });
+
+    // Clear token locally as well
+    try {
+        setAuthToken(null);
+    } catch (e) {}
+
+    router.push({ name: "Login" });
 };
 
 const goToProfile = () => {

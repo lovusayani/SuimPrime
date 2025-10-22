@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -67,11 +68,58 @@ class AuthController extends Controller
     // Logout
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
 
-        return response()->json([
+        if ($user) {
+            // If a bearer token was used, delete the current access token
+            try {
+                if ($request->bearerToken()) {
+                    $user->currentAccessToken()?->delete();
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+
+            // Also delete all tokens for the user to be safe
+            try {
+                $user->tokens()->delete();
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
+
+        // If using session/cookie based auth, also logout and invalidate the session
+        try {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        } catch (\Throwable $e) {
+            // ignore
+        }
+
+        $response = response()->json([
             'message' => 'Logged out successfully',
         ]);
+
+        // Clear session and XSRF cookies on client. Use the same domain/path attributes
+        // so the browser will remove the cookies that were previously set.
+        try {
+            $sessionCookie = config('session.cookie');
+            $domain = config('session.domain') ?: $request->getHost();
+            $path = config('session.path', '/');
+            $sameSite = config('session.same_site', 'lax');
+            $secure = config('session.secure', false);
+
+            // Expire session cookie
+            Cookie::queue(Cookie::make($sessionCookie, '', -2628000, $path, $domain, $secure, true, false, $sameSite));
+
+            // Expire XSRF cookie (not httponly)
+            Cookie::queue(Cookie::make('XSRF-TOKEN', '', -2628000, $path, $domain, $secure, false, false, $sameSite));
+        } catch (\Throwable $e) {
+            // ignore
+        }
+
+        return $response;
     }
 
     // Get authenticated user
