@@ -2,6 +2,39 @@
 @section('title', 'Create Movie')
 @section('content')
     <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.movies.index') }}">Movies</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Create</li>
+            </ol>
+        </nav>
+
+        <!-- TMDB Quick Import -->
+        <div class="d-flex flex-wrap align-items-center justify-content-md-end gap-3 mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <a class="ph ph-info" data-bs-toggle="tooltip"
+                    href="https://www.themoviedb.org/movie/533535-deadpool-wolverine" target="_blank"
+                    aria-label="To get a movie id, click on icon ."
+                    data-bs-original-title="To get a movie id, click on icon ."></a>
+                <label class="form-label mb-0" for="movie_id">Import movie from TMDB ( Add the movie id)<span
+                        class="text-danger">*</span></label>
+                <input class="form-control w-auto" type="text" name="movie_id" id="movie_id" value=""
+                    placeholder="e.g. #mv123456">
+            </div>
+
+            <div class="position-relative">
+                <button class="btn btn-md btn-primary" id="import_movie" type="button">
+                    <span id="import_button_text">Import</span>
+                    <span id="loader" style="display: none;">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </span>
+                </button>
+            </div>
+        </div>
+
         <h1>Create Movie</h1>
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -9,8 +42,8 @@
         @if (session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        <form method="POST" enctype="multipart/form-data" class="requires-validation" data-toggle="validator" id="form-submit"
-            novalidate="novalidate" action="{{ route('admin.movies.store') }}">
+        <form method="POST" enctype="multipart/form-data" class="requires-validation" data-toggle="validator"
+            id="form-submit" novalidate="novalidate" action="{{ route('admin.movies.store') }}">
             @csrf
             @include('admin.movies.partials.general')
             @include('admin.movies.partials.video')
@@ -436,103 +469,103 @@
         </script>
         <script type="text/javascript">
             /* document.addEventListener('DOMContentLoaded', function() {
-                                                const form = document.getElementById('form-submit');
-                                                const submitButton = document.getElementById('submit-button');
-                                                const seoCheckbox = document.getElementById('enableSeoIntegration');
-                                                const metaTitle = document.getElementById('meta_title');
-                                                const metaTitleError = document.getElementById('meta_title_error');
-                                                const hiddenInputsContainer = document.getElementById('meta_keywords_hidden_inputs');
-                                                const errorMsg = document.getElementById('meta_keywords_error');
-                                                const tagifyInput = document.getElementById('meta_keywords_input');
-                                                const tagifyWrapper = tagifyInput ? tagifyInput.closest('.tagify') : null;
-                                                const keywordInputs = hiddenInputsContainer ? hiddenInputsContainer.querySelectorAll(
-                                                    'input[name="meta_keywords[]"]') : [];
-                                                const googleVerification = document.getElementById('google_site_verification');
-                                                const canonicalUrl = document.getElementById('canonical_url');
-                                                const shortDescription = document.getElementById('short_description');
-                                                const seoImage = document.getElementById('seo_image');
-                                                const seoImagePreview = document.getElementById('selectedSeoImage');
-                                                const seoImageError = document.querySelector('#seo_image_input + .invalid-feedback');
+                                                                                                const form = document.getElementById('form-submit');
+                                                                                                const submitButton = document.getElementById('submit-button');
+                                                                                                const seoCheckbox = document.getElementById('enableSeoIntegration');
+                                                                                                const metaTitle = document.getElementById('meta_title');
+                                                                                                const metaTitleError = document.getElementById('meta_title_error');
+                                                                                                const hiddenInputsContainer = document.getElementById('meta_keywords_hidden_inputs');
+                                                                                                const errorMsg = document.getElementById('meta_keywords_error');
+                                                                                                const tagifyInput = document.getElementById('meta_keywords_input');
+                                                                                                const tagifyWrapper = tagifyInput ? tagifyInput.closest('.tagify') : null;
+                                                                                                const keywordInputs = hiddenInputsContainer ? hiddenInputsContainer.querySelectorAll(
+                                                                                                    'input[name="meta_keywords[]"]') : [];
+                                                                                                const googleVerification = document.getElementById('google_site_verification');
+                                                                                                const canonicalUrl = document.getElementById('canonical_url');
+                                                                                                const shortDescription = document.getElementById('short_description');
+                                                                                                const seoImage = document.getElementById('seo_image');
+                                                                                                const seoImagePreview = document.getElementById('selectedSeoImage');
+                                                                                                const seoImageError = document.querySelector('#seo_image_input + .invalid-feedback');
 
-                                                const metaKeywordsError = document.getElementById('meta_keywords_error');
-                                                let formSubmitted = false;
-                                                if (form) {
-                                                    const requiredFields = form.querySelectorAll('[required]');
-                                                    if (requiredFields.length > 0) {
-                                                        requiredFields.forEach(field => {
-                                                            field.addEventListener('input', () => validateField(field));
-                                                            field.addEventListener('change', () => validateField(field));
-                                                        });
-                                                    }
-                                                    form.addEventListener('submit', function(event) {
-                                                        if (formSubmitted) {
-                                                            event.preventDefault();
-                                                            return;
-                                                        }
+                                                                                                const metaKeywordsError = document.getElementById('meta_keywords_error');
+                                                                                                let formSubmitted = false;
+                                                                                                if (form) {
+                                                                                                    const requiredFields = form.querySelectorAll('[required]');
+                                                                                                    if (requiredFields.length > 0) {
+                                                                                                        requiredFields.forEach(field => {
+                                                                                                            field.addEventListener('input', () => validateField(field));
+                                                                                                            field.addEventListener('change', () => validateField(field));
+                                                                                                        });
+                                                                                                    }
+                                                                                                    form.addEventListener('submit', function(event) {
+                                                                                                        if (formSubmitted) {
+                                                                                                            event.preventDefault();
+                                                                                                            return;
+                                                                                                        }
 
-                                                        let isValid = validateForm();
+                                                                                                        let isValid = validateForm();
 
-                                                        if (seoCheckbox && seoCheckbox.checked) {
-                                                            if (!validateSeoImage()) {
-                                                                event.preventDefault(); // stop form submit
-                                                            }
-                                                            if (metaTitle && metaTitle.value === '') {
-                                                                isValid = false;
-                                                                metaTitle.classList.add('is-invalid');
-                                                                if (metaTitleError) metaTitleError.style.display = 'block';
-                                                            } else if (metaTitle) {
-                                                                metaTitle.classList.remove('is-invalid');
-                                                                if (metaTitleError) metaTitleError.style.display = 'none';
-                                                            }
-                                                            // Tagify validation: check if it has tags
-                                                            if (tagifyInput && tagifyInput.value === '') {
-                                                                if (keywordInputs.length === 0) {
-                                                                    isValid = false;
+                                                                                                        if (seoCheckbox && seoCheckbox.checked) {
+                                                                                                            if (!validateSeoImage()) {
+                                                                                                                event.preventDefault(); // stop form submit
+                                                                                                            }
+                                                                                                            if (metaTitle && metaTitle.value === '') {
+                                                                                                                isValid = false;
+                                                                                                                metaTitle.classList.add('is-invalid');
+                                                                                                                if (metaTitleError) metaTitleError.style.display = 'block';
+                                                                                                            } else if (metaTitle) {
+                                                                                                                metaTitle.classList.remove('is-invalid');
+                                                                                                                if (metaTitleError) metaTitleError.style.display = 'none';
+                                                                                                            }
+                                                                                                            // Tagify validation: check if it has tags
+                                                                                                            if (tagifyInput && tagifyInput.value === '') {
+                                                                                                                if (keywordInputs.length === 0) {
+                                                                                                                    isValid = false;
 
-                                                                    // Show error message
-                                                                    if (errorMsg) errorMsg.style.display = 'block';
+                                                                                                                    // Show error message
+                                                                                                                    if (errorMsg) errorMsg.style.display = 'block';
 
-                                                                    // Add visual error indication to Tagify input
-                                                                    if (tagifyWrapper) {
-                                                                        tagifyWrapper.classList.add('is-invalid');
-                                                                    }
-                                                                } else {
-                                                                    const tagifyInputValue = tagifyInput.value;
-                                                                    const keywordValues = tagifyInputValue.map(item => item.value);
-                                                                    const metaKeywordsInput = document.getElementById('meta_keywords_input');
-                                                                    if (metaKeywordsInput) metaKeywordsInput.value = JSON.stringify(
-                                                                        keywordValues);
-                                                                    // Hide error if input is valid
-                                                                    if (errorMsg) errorMsg.style.display = 'none';
-                                                                    if (tagifyWrapper) {
-                                                                        tagifyWrapper.classList.remove('is-invalid');
-                                                                    }
-                                                                }
-                                                            } else if (tagifyInput) {
-                                                                if (errorMsg) errorMsg.style.display = 'none';
-                                                                if (tagifyWrapper) {
-                                                                    tagifyWrapper.classList.remove('is-invalid');
-                                                                }
-                                                            }
-                                                        }
-
-
+                                                                                                                    // Add visual error indication to Tagify input
+                                                                                                                    if (tagifyWrapper) {
+                                                                                                                        tagifyWrapper.classList.add('is-invalid');
+                                                                                                                    }
+                                                                                                                } else {
+                                                                                                                    const tagifyInputValue = tagifyInput.value;
+                                                                                                                    const keywordValues = tagifyInputValue.map(item => item.value);
+                                                                                                                    const metaKeywordsInput = document.getElementById('meta_keywords_input');
+                                                                                                                    if (metaKeywordsInput) metaKeywordsInput.value = JSON.stringify(
+                                                                                                                        keywordValues);
+                                                                                                                    // Hide error if input is valid
+                                                                                                                    if (errorMsg) errorMsg.style.display = 'none';
+                                                                                                                    if (tagifyWrapper) {
+                                                                                                                        tagifyWrapper.classList.remove('is-invalid');
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            } else if (tagifyInput) {
+                                                                                                                if (errorMsg) errorMsg.style.display = 'none';
+                                                                                                                if (tagifyWrapper) {
+                                                                                                                    tagifyWrapper.classList.remove('is-invalid');
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
 
 
 
-                                                        if (!isValid) {
-                                                            event.preventDefault();
-                                                            submitButton.disabled = false;
-                                                            formSubmitted = false; // Reset the flag
-                                                            return;
-                                                        }
 
-                                                        submitButton.disabled = true;
-                                                        submitButton.innerText = 'Loading...';
-                                                        formSubmitted = true;
-                                                    });
-                                                }
-                                            }); */
+
+                                                                                                        if (!isValid) {
+                                                                                                            event.preventDefault();
+                                                                                                            submitButton.disabled = false;
+                                                                                                            formSubmitted = false; // Reset the flag
+                                                                                                            return;
+                                                                                                        }
+
+                                                                                                        submitButton.disabled = true;
+                                                                                                        submitButton.innerText = 'Loading...';
+                                                                                                        formSubmitted = true;
+                                                                                                    });
+                                                                                                }
+                                                                                            }); */
             document.addEventListener('DOMContentLoaded', function() {
                 flatpickr('.min-datetimepicker-time', {
                     enableTime: true,
@@ -1058,7 +1091,145 @@
                     console.warn('Select2 is not loaded yet.');
                 }
 
+                // TMDB quick import handler
+                $('#import_movie').on('click', function() {
+                    const raw = ($('#movie_id').val() || '').toString();
+                    const id = raw.replace(/[^0-9]/g, '');
+                    if (!id) {
+                        window.errorSnackbar ? window.errorSnackbar('Please enter a valid TMDB movie ID') :
+                            alert('Please enter a valid TMDB movie ID');
+                        return;
+                    }
 
+                    // Show loader, hide button text
+                    $('#import_button_text').hide();
+                    $('#loader').show();
+                    $('#import_movie').prop('disabled', true);
+
+                    $.ajax({
+                        url: "{{ route('admin.tmdb.fetch') }}",
+                        method: 'POST',
+                        data: {
+                            movie_id: id
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name=\"csrf-token\"]').attr('content')
+                        },
+                        success: function(resp) {
+                            if (!resp || !resp.success) {
+                                const msg = resp && resp.message ? resp.message : 'Import failed';
+                                window.errorSnackbar ? window.errorSnackbar(msg) : alert(msg);
+                                return;
+                            }
+                            const tmdb = resp.movie || {};
+                            const related = resp.related_data || {};
+                            const images = resp.image_paths || {};
+                            // Hidden flags
+                            $('#tmdb_id').val(tmdb.tmdb_id || id);
+                            $('#is_import').val('1');
+                            // Basic fields
+                            if (tmdb.title) $('#name').val(tmdb.title);
+                            if (tmdb.overview) {
+                                if (typeof tinymce !== 'undefined' && tinymce.get('description')) {
+                                    tinymce.get('description').setContent(tmdb.overview);
+                                } else {
+                                    $('#description').val(tmdb.overview);
+                                }
+                            }
+                            if (tmdb.release_date) $('#release_date').val(tmdb.release_date);
+                            if (tmdb.vote_average != null) $('#IMDb_rating').val(tmdb.vote_average);
+                            // Runtime minutes -> HH:MM
+                            const toHHMM = (mins) => {
+                                if (!mins || isNaN(mins)) return '';
+                                const h = Math.floor(mins / 60);
+                                const m = mins % 60;
+                                return String(h).padStart(2, '0') + ':' + String(m).padStart(2,
+                                    '0');
+                            };
+                            if (tmdb.runtime) $('#duration').val(toHHMM(parseInt(tmdb.runtime,
+                                10)));
+                            // Language map
+                            const langMap = {
+                                en: 'english',
+                                es: 'spanish',
+                                fr: 'french',
+                                ar: 'arabic',
+                                de: 'german',
+                                hi: 'hindi',
+                                ta: 'tamil',
+                                te: 'telugu',
+                                ml: 'malayalam'
+                            };
+                            const mapped = langMap[(tmdb.original_language || '').toLowerCase()];
+                            if (mapped && $('#language option').filter(function() {
+                                    return $(this).val().toLowerCase() === mapped;
+                                }).length > 0) {
+                                $('#language').val(mapped).trigger('change');
+                            }
+                            // Multi-selects
+                            if (Array.isArray(related.genre_ids)) $('#genres').val(related
+                                .genre_ids).trigger('change');
+                            if (Array.isArray(related.actor_ids)) $('#actors').val(related
+                                .actor_ids).trigger('change');
+                            if (Array.isArray(related.director_ids)) $('#directors').val(related
+                                .director_ids).trigger('change');
+                            if (Array.isArray(related.country_ids) && related.country_ids.length >
+                                0) {
+                                $('#countries').val(related.country_ids).trigger('change');
+                            }
+
+                            // Trailer data
+                            if (resp.trailer && resp.trailer.url) {
+                                const trailer = resp.trailer;
+                                // Set trailer type to YouTube
+                                $('#trailer_url_type').val('YouTube').trigger('change');
+                                // Wait a moment for the visibility logic to complete, then set URL
+                                setTimeout(function() {
+                                    $('#trailer_url').val(trailer.url);
+                                }, 100);
+                            }
+
+                            // Images - Update both hidden input and visible preview
+                            const thumb = images.thumbnail || '';
+                            const poster = images.poster || '';
+                            const tv = images.poster_tv || '';
+
+                            if (thumb) {
+                                $('#thumbnail_url').val(thumb);
+                                $('#thumbnail_input').val(thumb);
+                                $('#selectedImage').attr('src', thumb).css('display', 'block');
+                                $('#selectedImageContainerThumbnail').show();
+                            }
+                            if (poster) {
+                                $('#poster_url').val(poster);
+                                $('#poster_input').val(poster);
+                                $('#selectedPosterImage').attr('src', poster).css('display',
+                                    'block');
+                                $('#selectedImageContainerPoster').show();
+                            }
+                            if (tv) {
+                                $('#poster_tv_url').val(tv);
+                                $('#poster_tv_input').val(tv);
+                                $('#selectedPosterTvImage').attr('src', tv).css('display', 'block');
+                                $('#selectedImageContainerPosterTv').show();
+                            }
+
+                            window.successSnackbar ? window.successSnackbar('TMDB data imported') :
+                                alert('TMDB data imported');
+                        },
+                        error: function(xhr) {
+                            const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr
+                                .responseJSON.message : 'Server error while importing';
+                            window.errorSnackbar ? window.errorSnackbar(msg) : alert(msg);
+                        },
+                        complete: function() {
+                            // Hide loader, show button text
+                            $('#loader').hide();
+                            $('#import_button_text').show();
+                            $('#import_movie').prop('disabled', false);
+                        }
+                    });
+                });
 
                 // Handle form submit
                 $('#form-submit').on('submit', function(e) {
