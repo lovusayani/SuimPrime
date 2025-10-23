@@ -2,7 +2,8 @@ APP_NAME=SuimPrime
 APP_ENV=local
 APP_KEY=base64:F6vEk4C0kiBYP7QeKXCsBaSdGMjs8hkOK7IYpJcKMeE=
 APP_DEBUG=true
-APP_URL=https://suimprime.com/
+#APP_URL=https://suimprime.com/  # Production
+APP_URL=http://127.0.0.1:8000  # Local development
 VITE_APP_URL=https://suimprime.com
 
 APP_LOCALE=en
@@ -64,6 +65,11 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
-SESSION_DOMAIN=.suimprime.com
-SANCTUM_STATEFUL_DOMAINS=suimprime.com
+# Frontend dev servers (include host and port used by Vite)
+SANCTUM_STATEFUL_DOMAINS=127.0.0.1:5173,localhost:5173  # Local development (Vite)
+#SANCTUM_STATEFUL_DOMAINS=suimprime.com  #Production
+
+SESSION_DOMAIN=127.0.0.1   # Local development
+#SESSION_DOMAIN=.suimprime.com  #Production
+
 FRONTEND_URL=https://suimprime.com
