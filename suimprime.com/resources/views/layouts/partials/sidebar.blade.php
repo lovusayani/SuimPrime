@@ -3,15 +3,18 @@
     <div class="d-flex align-items-center justify-content-start">
         <div class="logo-main">
             <a href="/admin/dashboard" class="navbar-brand">
-                <img class="logo-normal img-fluid" src="{{ asset(\App\Models\Setting::get('logo_dark')) }}" height="30"
-                    alt="Logo">
-                <img class="logo-normal dark-normal img-fluid" src="{{ asset(\App\Models\Setting::get('logo_dark')) }}"
+                <img class="logo-normal img-fluid"
+                    src="{{ \App\Models\Setting::get('dark_logo') ? asset(\App\Models\Setting::get('dark_logo')) : asset('public/assets/logo/dark_logo.png') }}"
+                    height="30" alt="Logo">
+                <img class="logo-normal dark-normal img-fluid"
+                    src="{{ \App\Models\Setting::get('dark_logo') ? asset(\App\Models\Setting::get('dark_logo')) : asset('public/assets/logo/dark_logo.png') }}"
                     height="30" alt="Logo Dark">
-                <img class="logo-mini img-fluid" src="{{ asset(\App\Models\Setting::get('logo_mini')) }}" height="30"
-                    alt="Logo Mini">
-                <img class="logo-mini dark-mini img-fluid" src="{{ asset(\App\Models\Setting::get('logo_dark_mini')) }}"
+                <img class="logo-mini img-fluid"
+                    src="{{ \App\Models\Setting::get('mini_logo') ? asset(\App\Models\Setting::get('mini_logo')) : asset('public/assets/logo/mini_logo.png') }}"
+                    height="30" alt="Logo Mini">
+                <img class="logo-mini dark-mini img-fluid"
+                    src="{{ \App\Models\Setting::get('mini_logo') ? asset(\App\Models\Setting::get('mini_logo')) : asset('public/assets/logo/mini_logo.png') }}"
                     height="30" alt="Logo Dark Mini">
-
             </a>
         </div>
         <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
@@ -228,28 +231,28 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#/app/plans">
+                    <a class="nav-link" href="{{ route('admin.plans.index') }}">
                         <i class='icon ph ph-list-dashes' data-bs-toggle="tooltip" data-bs-placement="right"
                             aria-label="Plans" data-bs-original-title="Plans"></i><span
                             class='item-name'>Plans</span><i class='icon '></i>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#/app/planlimitation">
+                    <a class="nav-link" href="{{ route('admin.planlimitation.index') }}">
                         <i class='icon ph ph-warning-octagon' data-bs-toggle="tooltip" data-bs-placement="right"
-                            aria-label="Plan Limits" data-bs-original-title="Plan Limits"></i><span
-                            class='item-name'>Plan Limits</span><i class='icon '></i>
+                            aria-label="Planlimitation" data-bs-original-title="Planlimitation"></i><span
+                            class='item-name'>Planlimitation</span><i class='icon '></i>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#/app/pay-per-view-history">
+                    <a class="nav-link" href="{{ route('admin.payperview.index') }}">
                         <i class='icon ph ph-hand' data-bs-toggle="tooltip" data-bs-placement="right"
                             aria-label="Rent History" data-bs-original-title="Rent History"></i><span
                             class='item-name'>Rent History</span><i class='icon '></i>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#/app/coupon">
+                    <a class="nav-link" href="{{ route('admin.coupon.index') }}">
                         <i class='icon ph ph-ticket' data-bs-toggle="tooltip" data-bs-placement="right"
                             aria-label="Coupon" data-bs-original-title="Coupon"></i><span
                             class='item-name'>Coupon</span><i class='icon '></i>
@@ -264,7 +267,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#/app/users">
+                    <a class="nav-link" href="{{ route('admin.users.index') }}">
                         <i class='icon ph ph-user' data-bs-toggle="tooltip" data-bs-placement="right"
                             aria-label="Users" data-bs-original-title="Users"></i><span
                             class='item-name'>Users</span><i class='icon '></i>

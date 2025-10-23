@@ -350,23 +350,55 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        // handle simple text inputs
+        // Validate Business Settings
         $request->validate([
-            'site_name' => 'nullable|string|max:255',
+            'app_name' => 'nullable|string|max:255',
+            'user_app_name' => 'nullable|string|max:255',
+            'helpline_number' => 'nullable|string|max:50',
+            'inquriy_email' => 'nullable|email|max:255',
+            'short_description' => 'nullable|string|max:500',
+            'mini_logo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
+            'dark_logo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
+            'favicon' => 'nullable|image|mimes:jpeg,jpg,png,gif,ico|max:1024',
         ]);
 
-        if ($request->filled('site_name')) {
-            Setting::set('site_name', $request->input('site_name'));
+        // Save Business Settings text fields
+        if ($request->filled('app_name')) {
+            Setting::set('app_name', $request->input('app_name'));
+        }
+        if ($request->filled('user_app_name')) {
+            Setting::set('user_app_name', $request->input('user_app_name'));
+        }
+        if ($request->filled('helpline_number')) {
+            Setting::set('helpline_number', $request->input('helpline_number'));
+        }
+        if ($request->filled('inquriy_email')) {
+            Setting::set('inquriy_email', $request->input('inquriy_email'));
+        }
+        if ($request->filled('short_description')) {
+            Setting::set('short_description', $request->input('short_description'));
         }
 
-        // handle optional file uploads for logos
-        foreach (['logo_normal', 'logo_dark', 'logo_mini'] as $key) {
-            if ($request->hasFile($key) && $request->file($key)->isValid()) {
-                $file = $request->file($key);
-                $filename = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('uploads/logos', $filename, 'public');
-                Setting::set($key, '/storage/' . $path);
-            }
+        // Handle logo uploads
+        if ($request->hasFile('mini_logo') && $request->file('mini_logo')->isValid()) {
+            $file = $request->file('mini_logo');
+            $filename = 'mini-logo-' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/logos', $filename, 'public');
+            Setting::set('mini_logo', 'storage/' . $path);
+        }
+
+        if ($request->hasFile('dark_logo') && $request->file('dark_logo')->isValid()) {
+            $file = $request->file('dark_logo');
+            $filename = 'dark-logo-' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/logos', $filename, 'public');
+            Setting::set('dark_logo', 'storage/' . $path);
+        }
+
+        if ($request->hasFile('favicon') && $request->file('favicon')->isValid()) {
+            $file = $request->file('favicon');
+            $filename = 'favicon-' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/logos', $filename, 'public');
+            Setting::set('favicon', 'storage/' . $path);
         }
 
         // Save module-related toggles if present
@@ -401,6 +433,6 @@ class SettingsController extends Controller
             Setting::set('from_name', $request->input('from_name', env('MAIL_FROM_NAME', '')));
         }
 
-        return redirect()->route('admin.settings.logo')->with('success', 'Settings updated.');
+        return redirect()->back()->with('success', 'Settings updated successfully.');
     }
 }

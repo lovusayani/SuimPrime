@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark" dir="ltr">
+
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,7 +13,8 @@
         <meta name="author" content="Iqonic Design">
         <meta name="DC.title" content="Streamit Simple | Responsive Bootstrap 5 Admin Dashboard Template">
         <!-- Favicon -->
-        <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
+        <link rel="shortcut icon"
+            href="{{ \App\Models\Setting::get('favicon') ? asset(\App\Models\Setting::get('favicon')) : asset('assets/images/favicon.ico') }}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
             integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
             crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -43,6 +45,7 @@
             :root {}
         </style>
     </head>
+
     <body>
         <!-- Loader Start -->
         <div id="loading">
@@ -57,8 +60,8 @@
                                 <div class="text-center">
                                     <a href="/admin/login">
                                         <img class="logo-normal img-fluid"
-                                            src="{{ asset(\App\Models\Setting::get('logo_dark')) }}" height="30"
-                                            alt="Logo">
+                                            src="{{ \App\Models\Setting::get('dark_logo') ? asset(\App\Models\Setting::get('dark_logo')) : asset('public/assets/logo/dark_logo.png') }}"
+                                            height="30" alt="Logo">
                                     </a>
                                 </div>
 
@@ -196,4 +199,5 @@
         </div>
         <!-- Scripts -->
     </body>
+
 </html>

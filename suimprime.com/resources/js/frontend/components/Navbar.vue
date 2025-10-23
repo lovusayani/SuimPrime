@@ -20,7 +20,7 @@
                 <router-link to="/" class="navbar-brand">
                     <img
                         class="logo-normal dark-normal img-fluid logo"
-                        src="/public/assets/logo/dark_logo.png"
+                        :src="settings.dark_logo"
                         height="30"
                         alt="Logo Dark"
                     />
@@ -211,6 +211,22 @@ const userDropdownRef = ref(null);
 // User reactive state
 const user = ref(null);
 
+// Settings state
+const settings = ref({
+    app_name: "SuimPrime",
+    dark_logo: "/public/assets/logo/dark_logo.png",
+});
+
+// Fetch settings on mount
+onMounted(async () => {
+    try {
+        const response = await axios.get("/api/settings");
+        settings.value = response.data;
+    } catch (error) {
+        console.error("Failed to load settings:", error);
+    }
+});
+
 // Fetch user from localStorage
 onMounted(() => {
     const storedUser = localStorage.getItem("user");
@@ -220,12 +236,12 @@ onMounted(() => {
 // If no user in storage, try to fetch from backend (supports cookie or token)
 onMounted(() => {
     // listen for login events from Login.vue
-    window.addEventListener('auth:login', (ev) => {
+    window.addEventListener("auth:login", (ev) => {
         const u = ev?.detail?.user;
         if (u) {
             user.value = u;
             try {
-                localStorage.setItem('user', JSON.stringify(u));
+                localStorage.setItem("user", JSON.stringify(u));
             } catch (e) {}
         }
     });
@@ -251,17 +267,28 @@ onUnmounted(() => {
 const logout = async () => {
     // Call server to delete token(s). Axios will attach Authorization header if present.
     try {
-        await axios.post('/logout', {}, { withCredentials: true });
+        await axios.post("/logout", {}, { withCredentials: true });
     } catch (e) {
         // Ignore network errors — we'll still clear client state
-        console.warn('Logout request failed', e?.response?.status || e?.message);
+        console.warn(
+            "Logout request failed",
+            e?.response?.status || e?.message
+        );
     }
 
     // Immediately clear client-side token and user so UI updates without reload
-    try { setAuthToken(null); } catch (e) {}
-    try { localStorage.removeItem('access_token'); } catch (e) {}
-    try { localStorage.removeItem('token'); } catch (e) {}
-    try { localStorage.removeItem('user'); } catch (e) {}
+    try {
+        setAuthToken(null);
+    } catch (e) {}
+    try {
+        localStorage.removeItem("access_token");
+    } catch (e) {}
+    try {
+        localStorage.removeItem("token");
+    } catch (e) {}
+    try {
+        localStorage.removeItem("user");
+    } catch (e) {}
 
     user.value = null;
     showUserDropdown.value = false;
@@ -274,22 +301,26 @@ const logout = async () => {
     } catch (e) {}
 
     try {
-        window.dispatchEvent(new CustomEvent('auth:logout'));
+        window.dispatchEvent(new CustomEvent("auth:logout"));
     } catch (e) {}
 
     // Navigate to Login immediately (no full reload)
-    router.push({ name: 'Login' });
+    router.push({ name: "Login" });
 
     // Verify server-side session cleared; if still authenticated, try extra cookie clears and reload
     try {
-        const me = await axios.get('/me');
+        const me = await axios.get("/me");
         if (me?.data) {
             // server still returns a user — attempt more aggressive cookie clearing and reload
             try {
                 const host = window.location.hostname;
                 // common variants
-                const domains = [host, '.' + host, window.location.hostname.replace(/^www\./, '')];
-                const paths = ['/', ''];
+                const domains = [
+                    host,
+                    "." + host,
+                    window.location.hostname.replace(/^www\./, ""),
+                ];
+                const paths = ["/", ""];
                 for (const d of domains) {
                     for (const p of paths) {
                         try {

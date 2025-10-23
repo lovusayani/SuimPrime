@@ -142,13 +142,37 @@ class MovieController extends Controller
                 }
             }
 
-            // 4. Save Subtitles
-            if ($request->has('subtitles') && is_array($request->subtitles)) {
-                foreach ($request->subtitles as $sub) {
+            // 4. Save Subtitles (only when enabled and with valid data)
+            if (($request->enable_subtitle ?? 0) && $request->has('subtitles') && is_array($request->subtitles)) {
+                foreach ($request->subtitles as $idx => $sub) {
+                    $language = isset($sub['language']) ? trim((string) $sub['language']) : '';
+                    $isDefault = !empty($sub['is_default']) ? 1 : 0;
+
+                    // Grab uploaded file for this row if present
+                    $uploadedFile = $request->file("subtitles.$idx.subtitle_file");
+
+                    // Skip empty rows (no language and no file)
+                    if ($language === '' && !$uploadedFile) {
+                        continue;
+                    }
+
+                    // DB requires non-null language; if language is missing, skip this row
+                    if ($language === '') {
+                        continue;
+                    }
+
+                    $storedUrl = null;
+                    if ($uploadedFile) {
+                        // Store under public/subtitles and expose via storage symlink
+                        $storedPath = $uploadedFile->store('subtitles', 'public');
+                        $storedUrl = url('/storage/' . $storedPath);
+                    }
+
+                    // Create subtitle record; DB expects non-null language, but file may be nullable
                     $movie->subtitles()->create([
-                        'language' => $sub['language'] ?? null,
-                        'subtitle_file' => $sub['subtitle_file'] ?? null,
-                        'is_default' => isset($sub['is_default']) ? 1 : 0,
+                        'language' => $language,
+                        'subtitle_file' => $storedUrl,
+                        'is_default' => $isDefault,
                     ]);
                 }
             }

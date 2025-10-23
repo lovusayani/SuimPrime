@@ -6,7 +6,7 @@
                 <div class="text-center auth-heading mb-3">
                     <a href="#" class="d-inline-block mb-2">
                         <img
-                            src="/public/assets/logo/dark_logo.png"
+                            :src="settings.dark_logo"
                             alt="Logo"
                             class="img-fluid logo h-4 mb-4"
                         />
@@ -188,7 +188,9 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import axios from "../axios";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 const firstName = ref("");
 const lastName = ref("");
@@ -198,17 +200,26 @@ const confirmPassword = ref("");
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const errorMessage = ref("");
+const router = useRouter();
+
+const settings = ref({
+    app_name: "SuimPrime",
+    dark_logo: "/public/assets/logo/dark_logo.png",
+});
+
+// Fetch settings on mount
+onMounted(async () => {
+    try {
+        const response = await axios.get("/api/settings");
+        settings.value = response.data;
+    } catch (error) {
+        console.error("Failed to load settings:", error);
+    }
+});
 
 const togglePassword = () => (showPassword.value = !showPassword.value);
 const toggleConfirmPassword = () =>
     (showConfirmPassword.value = !showConfirmPassword.value);
-
-import axios from "axios";
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://127.0.0.1:8000";
-
-import { useRouter } from "vue-router";
-const router = useRouter();
 
 const register = async () => {
     try {

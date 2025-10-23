@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DirectorController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MovieController;
+use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\AuthController;
@@ -35,8 +36,21 @@ Route::prefix('admin')->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+    
+    // Users
+    Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::get('/users/details/{user}', [UserController::class, 'details'])->name('admin.users.details');
+    Route::get('/users/changepassword/{user}', [UserController::class, 'changePassword'])->name('admin.users.change-password');
+    Route::put('/users/changepassword/{user}', [UserController::class, 'updatePassword'])->name('admin.users.update-password');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::patch('/users/update-status/{user}', [UserController::class, 'updateStatus'])->name('admin.users.update-status');
+    Route::post('/users/bulk-action', [UserController::class, 'bulkAction'])->name('admin.users.bulk-action');
     Route::patch('/users/{id}/toggle', [UserController::class, 'toggleSubscription'])->name('admin.users.toggle');
+    
     Route::resource('/content', ContentController::class, ['as' => 'admin']);
     Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 });
@@ -82,6 +96,37 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // admin.movie.bulkAction
     Route::post('movies/bulk-action', [GenreController::class, 'bulkAction'])->name('movies.bulkAction');
     Route::patch('movies/update-status/{movies}', [GenreController::class, 'updateStatus'])->name('movies.updateStatus');
+
+    // Plans
+    Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
+    Route::get('plans/create', [PlanController::class, 'create'])->name('plans.create');
+    Route::post('plans', [PlanController::class, 'store'])->name('plans.store');
+    Route::get('plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
+    Route::put('plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
+    Route::patch('plans/update-status/{plan}', [PlanController::class, 'updateStatus'])->name('plans.updateStatus');
+    Route::delete('plans/{plan}', [PlanController::class, 'destroy'])->name('plans.destroy');
+
+    // Plan Limitation
+    Route::get('planlimitation', [\App\Http\Controllers\Admin\PlanLimitationController::class, 'index'])->name('planlimitation.index');
+    Route::post('planlimitation/bulk-action', [\App\Http\Controllers\Admin\PlanLimitationController::class, 'bulkAction'])->name('planlimitation.bulkAction');
+    Route::patch('planlimitation/update-status/{planlimitation}', [\App\Http\Controllers\Admin\PlanLimitationController::class, 'updateStatus'])->name('planlimitation.updateStatus');
+    Route::get('planlimitation/{planlimitation}/edit', [\App\Http\Controllers\Admin\PlanLimitationController::class, 'edit'])->name('planlimitation.edit');
+    Route::put('planlimitation/{planlimitation}', [\App\Http\Controllers\Admin\PlanLimitationController::class, 'update'])->name('planlimitation.update');
+    Route::delete('planlimitation/{planlimitation}', [\App\Http\Controllers\Admin\PlanLimitationController::class, 'destroy'])->name('planlimitation.destroy');
+
+    // Pay Per View History
+    Route::get('pay-per-view-history', [\App\Http\Controllers\Admin\PayPerViewHistoryController::class, 'index'])->name('payperview.index');
+
+    // Coupons
+    Route::get('coupon', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('coupon.index');
+    Route::get('coupon/create', [\App\Http\Controllers\Admin\CouponController::class, 'create'])->name('coupon.create');
+    Route::post('coupon/store', [\App\Http\Controllers\Admin\CouponController::class, 'store'])->name('coupon.store');
+    Route::get('coupon/{coupon}/edit', [\App\Http\Controllers\Admin\CouponController::class, 'edit'])->name('coupon.edit');
+    Route::put('coupon/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'update'])->name('coupon.update');
+    Route::delete('coupon/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'destroy'])->name('coupon.destroy');
+    Route::patch('coupon/update-status/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'updateStatus'])->name('coupon.updateStatus');
+    Route::post('coupon/bulk-action', [\App\Http\Controllers\Admin\CouponController::class, 'bulkAction'])->name('coupon.bulkAction');
+
     // Actor
     Route::get('actors', [ActorController::class, 'index'])->name('actors.index');
     // admin.actors.create

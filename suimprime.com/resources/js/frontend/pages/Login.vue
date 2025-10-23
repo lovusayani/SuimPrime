@@ -6,14 +6,14 @@
                 <div class="text-center auth-heading mb-3">
                     <a href="#" class="d-inline-block mb-2">
                         <img
-                            src="/public/assets/logo/dark_logo.png"
+                            :src="settings.dark_logo"
                             alt="Logo"
                             class="img-fluid logo h-4 mb-2"
                         />
                     </a>
                     <h5>
-                        Welcome Back to Suim Prime: Your Ultimate Entertainment
-                        Hub!
+                        Welcome Back to {{ settings.app_name }}: Your Ultimate
+                        Entertainment Hub!
                     </h5>
                     <p class="fs-14">We've eagerly awaited your return.</p>
                 </div>
@@ -128,7 +128,7 @@
 
 <script setup>
 import axios, { setAuthToken } from "../axios";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const email = ref("test2@gmail.com");
@@ -137,6 +137,21 @@ const rememberMe = ref(false);
 const showPassword = ref(false);
 const errorMessage = ref("");
 const router = useRouter();
+
+const settings = ref({
+    app_name: "SuimPrime",
+    dark_logo: "/public/assets/logo/dark_logo.png",
+});
+
+// Fetch settings on mount
+onMounted(async () => {
+    try {
+        const response = await axios.get("/api/settings");
+        settings.value = response.data;
+    } catch (error) {
+        console.error("Failed to load settings:", error);
+    }
+});
 
 const togglePassword = () => {
     showPassword.value = !showPassword.value;

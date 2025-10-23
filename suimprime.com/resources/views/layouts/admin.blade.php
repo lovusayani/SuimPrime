@@ -9,6 +9,9 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         {{-- Page Title --}}
         <title>@yield('title', 'Admin Panel')</title>
+        {{-- Favicon --}}
+        <link rel="shortcut icon"
+            href="{{ \App\Models\Setting::get('favicon') ? asset(\App\Models\Setting::get('favicon')) : asset('assets/images/favicon.ico') }}">
         {{-- CSS Files --}}
         <link rel="stylesheet" type="text/css"
             href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
