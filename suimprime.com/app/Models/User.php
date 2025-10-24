@@ -53,4 +53,38 @@ class User extends Authenticatable
             'status' => 'boolean',
         ];
     }
+
+    /**
+     * Relationships
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)
+                    ->where('status', 'active')
+                    ->where('ends_at', '>', now());
+    }
+
+    public function paymentTransactions()
+    {
+        return $this->hasMany(PaymentTransaction::class);
+    }
+
+    /**
+     * Helper methods
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this->activeSubscription()->exists();
+    }
+
+    public function getCurrentPlan()
+    {
+        $activeSubscription = $this->activeSubscription;
+        return $activeSubscription ? $activeSubscription->plan : null;
+    }
 }

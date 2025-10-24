@@ -24,15 +24,6 @@ class PaymentGateway extends Model
         'config' => 'array',
     ];
 
-    // Encrypt credentials when storing
-    protected function credentials(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? json_decode(decrypt($value), true) : null,
-            set: fn ($value) => $value ? encrypt(json_encode($value)) : null,
-        );
-    }
-
     // Scope for active gateways
     public function scopeActive($query)
     {

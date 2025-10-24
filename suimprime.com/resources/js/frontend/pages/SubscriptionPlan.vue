@@ -704,39 +704,215 @@ const processPayment = async () => {
     try {
         processing.value = true;
 
-        const response = await axios.post("/api/select-plan", {
+        // Create payment order
+        const response = await axios.post("/api/payment/create-order", {
             plan_id: selectedPlan.value.id,
-            plan_name: selectedPlan.value.name,
-            price: totalAmount.value,
-            payment_method: paymentMethod.value,
+            payment_gateway: paymentMethod.value,
         });
 
-        // Handle successful plan selection
-        console.log("Plan selected:", response.data);
-        alert(
-            `Payment initiated for ${selectedPlan.value.name} plan! Total: ₹${totalAmount.value}`
-        );
+        if (response.data.success) {
+            const paymentData = response.data.data;
 
-        // Reset form
-        showPaymentForm.value = false;
-        selectedPlan.value = null;
-        paymentMethod.value = "";
-    } catch (error) {
-        if (error.response?.status === 419 || error.response?.status === 401) {
-            // Token mismatch or unauthorized, redirect to login
-            router.push({ name: "Login" });
+            // Handle different payment gateways
+            switch (paymentMethod.value) {
+                case "cashfree":
+                    handleCashfreePayment(paymentData);
+                    break;
+                case "razorpay":
+                    handleRazorpayPayment(paymentData);
+                    break;
+                case "stripe":
+                    handleStripePayment(paymentData);
+                    break;
+                case "paypal":
+                    handlePaypalPayment(paymentData);
+                    break;
+                default:
+                    alert("Payment gateway not supported");
+            }
         } else {
-            console.error("Error processing payment:", error);
-            alert("An error occurred while processing payment.");
+            alert("Failed to create payment order: " + response.data.message);
         }
+    } catch (error) {
+        console.error("Payment error:", error);
+        alert("Payment failed. Please try again.");
     } finally {
         processing.value = false;
     }
 };
 
+// Handle Cashfree payment
+const handleCashfreePayment = async (paymentData) => {
+    try {
+        if (!paymentData.payment_session_id) {
+            alert("Payment session not available");
+            return;
+        }
+
+        // Show loading message
+        console.log("Starting payment process...");
+        console.log("Payment data received:", paymentData);
+
+        // Ensure Cashfree SDK is loaded
+        let cashfreeSDK;
+        try {
+            cashfreeSDK = await loadCashfreeSDK();
+            console.log("Cashfree SDK loaded:", cashfreeSDK);
+        } catch (error) {
+            console.error("Failed to load Cashfree SDK:", error);
+            alert(
+                "Failed to load payment system. Please refresh the page and try again."
+            );
+            return;
+        }
+
+        // Configure checkout options
+        const checkoutOptions = {
+            paymentSessionId: paymentData.payment_session_id,
+            returnUrl: `${window.location.origin}/subscription/payment/success?order_id=${paymentData.order_id}`,
+        };
+
+        console.log(
+            "Starting Cashfree checkout with options:",
+            checkoutOptions
+        );
+
+        // Start checkout process using the cashfree instance
+        const result = await cashfreeSDK.checkout(checkoutOptions);
+
+        console.log("Checkout result:", result);
+
+        if (result.error) {
+            console.error("Cashfree checkout error:", result.error);
+            alert(`Payment failed: ${result.error.message}`);
+        }
+
+        if (result.redirect) {
+            console.log("Payment redirection successful");
+            // User will be redirected to payment page
+        }
+    } catch (error) {
+        console.error("Cashfree payment error:", error);
+        console.error("Error details:", error);
+        alert("Payment initialization failed. Please try again.");
+    }
+};
+
+// Handle Razorpay payment (placeholder)
+const handleRazorpayPayment = (paymentData) => {
+    alert("Razorpay integration coming soon!");
+};
+
+// Handle Stripe payment (placeholder)
+const handleStripePayment = (paymentData) => {
+    alert("Stripe integration coming soon!");
+};
+
+// Handle PayPal payment (placeholder)
+const handlePaypalPayment = (paymentData) => {
+    alert("PayPal integration coming soon!");
+};
+
+// Load Cashfree SDK dynamically
+const loadCashfreeSDK = () => {
+    return new Promise((resolve, reject) => {
+        console.log("Loading Cashfree SDK...");
+
+        // Check if Cashfree constructor is already available
+        if (typeof window.Cashfree !== "undefined") {
+            console.log("Cashfree constructor already loaded");
+            // Initialize Cashfree with mode
+            const cashfreeInstance = window.Cashfree({
+                mode: "sandbox", // Use sandbox mode for testing
+            });
+            resolve(cashfreeInstance);
+            return;
+        }
+
+        // Check if script already exists
+        const existingScript = document.querySelector(
+            'script[src*="cashfree.js"]'
+        );
+        if (existingScript) {
+            console.log("Cashfree script already exists, waiting for load...");
+            // Wait for existing script to load
+            existingScript.onload = () => {
+                console.log(
+                    "Existing script loaded, checking for Cashfree constructor..."
+                );
+                // Wait a bit for the Cashfree constructor to be available
+                setTimeout(() => {
+                    if (typeof window.Cashfree !== "undefined") {
+                        console.log(
+                            "Cashfree constructor available after existing script load"
+                        );
+                        const cashfreeInstance = window.Cashfree({
+                            mode: "sandbox",
+                        });
+                        resolve(cashfreeInstance);
+                    } else {
+                        console.error(
+                            "Cashfree constructor not available after existing script load"
+                        );
+                        reject(new Error("Cashfree constructor not available"));
+                    }
+                }, 200);
+            };
+            return;
+        }
+
+        // Create new script
+        console.log("Creating new Cashfree script...");
+        const script = document.createElement("script");
+        script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+        script.async = true;
+        script.onload = () => {
+            console.log(
+                "New script loaded, checking for Cashfree constructor..."
+            );
+            // Wait a bit for the Cashfree constructor to be available
+            setTimeout(() => {
+                console.log("Window.Cashfree type:", typeof window.Cashfree);
+                if (typeof window.Cashfree !== "undefined") {
+                    console.log(
+                        "Cashfree constructor available after new script load"
+                    );
+                    const cashfreeInstance = window.Cashfree({
+                        mode: "sandbox",
+                    });
+                    resolve(cashfreeInstance);
+                } else {
+                    console.error(
+                        "Cashfree constructor not available after new script load"
+                    );
+                    reject(
+                        new Error(
+                            "Cashfree constructor not available after script load"
+                        )
+                    );
+                }
+            }, 200);
+        };
+        script.onerror = (error) => {
+            console.error("Failed to load Cashfree script:", error);
+            reject(new Error("Failed to load Cashfree SDK"));
+        };
+        document.head.appendChild(script);
+    });
+};
+
 // Fetch plans on component mount
-onMounted(() => {
+onMounted(async () => {
     fetchPlans();
+
+    // Pre-load Cashfree SDK
+    try {
+        await loadCashfreeSDK();
+        console.log("Cashfree SDK loaded successfully");
+    } catch (error) {
+        console.error("Failed to pre-load Cashfree SDK:", error);
+        // Don't alert here, we'll handle it when payment is attempted
+    }
 });
 </script>
 <style scoped>
