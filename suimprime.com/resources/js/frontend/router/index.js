@@ -14,6 +14,7 @@ import TermsConditions from '../pages/TermsConditions.vue';
 import DataDeletionRequest from '../pages/DataDeletionRequest.vue';
 import RefundCancellationPolicy from '../pages/RefundCancellationPolicy.vue';
 import FAQ from '../pages/FAQ.vue';
+import SubscriptionPlan from '../pages/SubscriptionPlan.vue';
 
 const routes = [
     {
@@ -30,6 +31,7 @@ const routes = [
             { path: '/data-deletation-request', name: 'DataDeletionRequest', component: DataDeletionRequest },
             { path: '/refund-and-cancellation-policy', name: 'RefundCancellationPolicy', component: RefundCancellationPolicy },
             { path: '/faq', name: 'FAQ', component: FAQ },
+            { path: '/subscription-plan', name: 'SubscriptionPlan', component: SubscriptionPlan, meta: { requiresAuth: true } },
         ],
     },
     {

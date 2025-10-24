@@ -1,12 +1,13 @@
 <template>
-    <FrontendLayout>
-        <div class="container py-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="home-page">
+        <!-- Header Section with spacing from navbar -->
+        <div class="container-fluid px-4 pt-5 mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h2 class="mb-0">
+                    <h2 class="mb-2">
                         Welcome back, {{ user?.name || "Viewer" }}!
                     </h2>
-                    <p class="text-muted">
+                    <p class="text-muted mb-0">
                         Enjoy your personalized recommendations.
                     </p>
                 </div>
@@ -30,75 +31,74 @@
                     >
                 </div>
             </div>
+        </div>
 
-            <div v-if="loading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-            </div>
+        <div v-if="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
 
-            <div v-else>
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Continue watching</h5>
-                        <p class="card-text text-muted">
-                            Pick up where you left off.
-                        </p>
+        <div v-else>
+            <!-- Continue Watching Section - Full Width -->
+            <div class="container-fluid px-4 mb-5">
+                <div class="section-header mb-4">
+                    <h5 class="section-title mb-2">Continue watching</h5>
+                    <p class="text-muted mb-0">Pick up where you left off.</p>
+                </div>
 
-                        <div class="row">
+                <div class="row g-3">
+                    <div
+                        v-for="n in 4"
+                        :key="n"
+                        class="col-6 col-md-4 col-lg-3 col-xl-2"
+                    >
+                        <div class="movie-card">
                             <div
-                                v-for="n in 4"
-                                :key="n"
-                                class="col-6 col-md-3 mb-3"
-                            >
-                                <div class="card h-100">
-                                    <div
-                                        class="ratio ratio-16x9 bg-secondary"
-                                    ></div>
-                                    <div class="card-body p-2">
-                                        <h6 class="mb-1">
-                                            Sample Title {{ n }}
-                                        </h6>
-                                        <small class="text-muted"
-                                            >Episode 1 • 1h 32m</small
-                                        >
-                                    </div>
-                                </div>
+                                class="ratio ratio-16x9 bg-secondary rounded"
+                            ></div>
+                            <div class="movie-info mt-2">
+                                <h6 class="movie-title mb-1">
+                                    Sample Title {{ n }}
+                                </h6>
+                                <small class="text-muted"
+                                    >Episode 1 • 1h 32m</small
+                                >
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Recommended for you</h5>
-                        <p class="text-muted">
-                            Curated picks based on your viewing history.
-                        </p>
+            <!-- Recommended Section - Full Width -->
+            <div class="container-fluid px-4 mb-5">
+                <div class="section-header mb-4">
+                    <h5 class="section-title mb-2">Recommended for you</h5>
+                    <p class="text-muted mb-0">
+                        Curated picks based on your viewing history.
+                    </p>
+                </div>
 
-                        <div class="row">
-                            <div
-                                v-for="n in 8"
-                                :key="'rec-' + n"
-                                class="col-6 col-sm-4 col-md-3 mb-3"
-                            >
-                                <div class="card h-100">
-                                    <div class="ratio ratio-16x9 bg-dark"></div>
-                                    <div class="card-body p-2">
-                                        <h6 class="mb-1">
-                                            Recommendation {{ n }}
-                                        </h6>
-                                    </div>
-                                </div>
+                <div class="row g-3">
+                    <div
+                        v-for="n in 8"
+                        :key="'rec-' + n"
+                        class="col-6 col-md-4 col-lg-3 col-xl-2"
+                    >
+                        <div class="movie-card">
+                            <div class="ratio ratio-16x9 bg-dark rounded"></div>
+                            <div class="movie-info mt-2">
+                                <h6 class="movie-title mb-1">
+                                    Recommendation {{ n }}
+                                </h6>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </FrontendLayout>
+    </div>
 </template>
 
 <script setup>
-import FrontendLayout from "../components/App.vue";
 import axios, { setAuthToken } from "../axios";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -160,3 +160,71 @@ onMounted(() => {
     fetchMovies();
 });
 </script>
+
+<style scoped>
+.home-page {
+    min-height: 100vh;
+    background-color: #0d0d0d;
+}
+
+.section-header {
+    border-left: 4px solid #e50914;
+    padding-left: 1rem;
+}
+
+.section-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.movie-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px);
+}
+
+.movie-card .ratio {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.movie-card:hover .ratio {
+    box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
+    border-color: rgba(229, 9, 20, 0.5);
+}
+
+.movie-info {
+    padding: 0.5rem 0;
+}
+
+.movie-title {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-muted {
+    color: #aaa !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .home-page .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+}
+</style>
