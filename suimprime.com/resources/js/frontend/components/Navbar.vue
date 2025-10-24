@@ -182,7 +182,7 @@
                                     <div class="iq-sub-card mb-0">
                                         <div class="notification_list">
                                             <span class="btn-inner">
-                                                <i class="ph ph-bell fs-5"></i>
+                                                <PhBell :size="20" />
                                             </span>
                                         </div>
                                     </div>
@@ -287,7 +287,7 @@
                                                 class="link-body-emphasis"
                                             >
                                                 <i
-                                                    class="ph ph-caret-right"
+                                                    class="ph-regular ph-caret-right"
                                                 ></i>
                                             </router-link>
                                         </div>
@@ -307,7 +307,7 @@
                                                         >My Watchlist</span
                                                     >
                                                     <i
-                                                        class="ph ph-caret-right"
+                                                        class="ph-regular ph-caret-right"
                                                     ></i>
                                                 </span>
                                             </router-link>
@@ -324,7 +324,7 @@
                                                         >Profile</span
                                                     >
                                                     <i
-                                                        class="ph ph-caret-right"
+                                                        class="ph-regular ph-caret-right"
                                                     ></i>
                                                 </span>
                                             </router-link>
@@ -342,7 +342,7 @@
                                                         plans</span
                                                     >
                                                     <i
-                                                        class="ph ph-caret-right"
+                                                        class="ph-regular ph-caret-right"
                                                     ></i>
                                                 </span>
                                             </router-link>
@@ -359,7 +359,7 @@
                                                         >Account Setting</span
                                                     >
                                                     <i
-                                                        class="ph ph-caret-right"
+                                                        class="ph-regular ph-caret-right"
                                                     ></i>
                                                 </span>
                                             </router-link>
@@ -492,6 +492,7 @@ import {
     readCachedDarkLogo,
     DEFAULT_DARK_LOGO,
 } from "../helpers/logo";
+import { PhBell, PhCaretRight } from "@phosphor-icons/vue";
 
 const router = useRouter();
 

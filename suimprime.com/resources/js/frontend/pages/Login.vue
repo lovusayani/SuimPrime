@@ -27,9 +27,9 @@
                 <form @submit.prevent="login" novalidate>
                     <input type="hidden" name="_token" value="..." />
                     <div class="input-group mb-3">
-                        <span class="input-group-text px-0"
-                            ><i class="ph ph-envelope"></i
-                        ></span>
+                        <span class="input-group-text px-0">
+                            <PhEnvelope :size="20" />
+                        </span>
                         <input
                             type="email"
                             v-model="email"
@@ -40,9 +40,9 @@
                     </div>
 
                     <div class="input-group mb-3">
-                        <span class="input-group-text px-0"
-                            ><i class="ph ph-lock-key"></i
-                        ></span>
+                        <span class="input-group-text px-0">
+                            <PhLockKey :size="20" />
+                        </span>
                         <input
                             :type="showPassword ? 'text' : 'password'"
                             v-model="password"
@@ -55,13 +55,8 @@
                             style="cursor: pointer"
                             @click="togglePassword"
                         >
-                            <i
-                                :class="
-                                    showPassword
-                                        ? 'ph ph-eye'
-                                        : 'ph ph-eye-slash'
-                                "
-                            ></i>
+                            <PhEye v-if="showPassword" :size="20" />
+                            <PhEyeSlash v-else :size="20" />
                         </span>
                     </div>
 
@@ -130,6 +125,7 @@
 import axios, { setAuthToken } from "../axios";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { PhEnvelope, PhLockKey, PhEye, PhEyeSlash } from "@phosphor-icons/vue";
 
 const email = ref("test2@gmail.com");
 const password = ref("12345678");

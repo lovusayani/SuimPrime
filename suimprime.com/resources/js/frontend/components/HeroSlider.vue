@@ -45,11 +45,8 @@
                             class="btn-watchlist"
                             @click="toggleWatchlist(movie)"
                         >
-                            <i
-                                :class="
-                                    movie.inWatchlist ? 'ph-check' : 'ph-plus'
-                                "
-                            ></i>
+                            <PhCheck v-if="movie.inWatchlist" :size="20" />
+                            <PhPlus v-else :size="20" />
                         </button>
                         <a href="#" class="btn-play"> ▶ Play Now </a>
                     </div>
@@ -67,6 +64,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
+import { PhCheck, PhPlus } from "@phosphor-icons/vue";
 
 const movies = ref([
     {
