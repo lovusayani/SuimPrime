@@ -8,6 +8,12 @@ import SignUp from "../pages/SignUp.vue";
 import Landing from '../pages/Landing.vue';
 import About from '../pages/About.vue';
 import Movies from '../pages/Movies.vue';
+import PrivacyPolicy from '../pages/PrivacyPolicy.vue';
+import HelpAndSupport from '../pages/HelpAndSupport.vue';
+import TermsConditions from '../pages/TermsConditions.vue';
+import DataDeletionRequest from '../pages/DataDeletionRequest.vue';
+import RefundCancellationPolicy from '../pages/RefundCancellationPolicy.vue';
+import FAQ from '../pages/FAQ.vue';
 
 const routes = [
     {
@@ -18,6 +24,12 @@ const routes = [
             { path: '/home', name: 'Home', component: Home, meta: { requiresAuth: true } },    // /home route
             { path: '/about', name: 'About', component: About },
             { path: '/movies', name: 'Movies', component: Movies },
+            { path: '/privacy-policy', name: 'PrivacyPolicy', component: PrivacyPolicy },
+            { path: '/help-and-support', name: 'HelpAndSupport', component: HelpAndSupport },
+            { path: '/terms-conditions', name: 'TermsConditions', component: TermsConditions },
+            { path: '/data-deletation-request', name: 'DataDeletionRequest', component: DataDeletionRequest },
+            { path: '/refund-and-cancellation-policy', name: 'RefundCancellationPolicy', component: RefundCancellationPolicy },
+            { path: '/faq', name: 'FAQ', component: FAQ },
         ],
     },
     {

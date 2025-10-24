@@ -199,10 +199,10 @@
                     </a>
                     <ul class="sub-nav collapse  " id="ads" data-bs-parent="#sidebar-menu">
                         <li class="nav-item">
-                            <a class="nav-link" href="#/app/vastads">
+                            <a class="nav-link" href="{{ route('admin.vastads.index') }}">
                                 <i class='icon ph ph-gear' data-bs-toggle="tooltip" data-bs-placement="right"
-                                    aria-label="VAST Ads Settings" data-bs-original-title="VAST Ads Settings"></i><i
-                                    class='sidenav-mini-icon'> V </i><span class='item-name'>VAST Ads Settings</span>
+                                    aria-label="VAST Ads" data-bs-original-title="VAST Ads"></i><i
+                                    class='sidenav-mini-icon'> V </i><span class='item-name'>VAST Ads</span>
                             </a>
                         </li>
                         <li class="nav-item">

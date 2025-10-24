@@ -4,13 +4,13 @@
             <div class="user-login-card card my-5 p-4">
                 <!-- Header -->
                 <div class="text-center auth-heading mb-3">
-                    <a href="#" class="d-inline-block mb-2">
+                    <router-link to="/" class="d-inline-block mb-2">
                         <img
-                            :src="settings.dark_logo"
-                            alt="Logo"
+                            :src="logoUrl"
+                            :alt="settings.app_name || 'Logo'"
                             class="img-fluid logo h-4 mb-4"
                         />
-                    </a>
+                    </router-link>
                     <h5>Sign up to Begin Your Adventure</h5>
                     <p class="font-size-14">
                         Create Your Account for unforgettable Experience
@@ -189,8 +189,14 @@
 
 <script setup>
 import axios from "../axios";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
+import {
+    normalizeLogoUrl,
+    cacheDarkLogo,
+    readCachedDarkLogo,
+    DEFAULT_DARK_LOGO,
+} from "../helpers/logo";
 
 const firstName = ref("");
 const lastName = ref("");
@@ -204,7 +210,7 @@ const router = useRouter();
 
 const settings = ref({
     app_name: "SuimPrime",
-    dark_logo: "/public/assets/logo/dark_logo.png",
+    dark_logo: "/assets/logo/dark_logo.png",
 });
 
 // Fetch settings on mount
@@ -212,10 +218,15 @@ onMounted(async () => {
     try {
         const response = await axios.get("/api/settings");
         settings.value = response.data;
+        cacheDarkLogo(response?.data?.dark_logo || "");
     } catch (error) {
         console.error("Failed to load settings:", error);
+        const cached = readCachedDarkLogo();
+        settings.value.dark_logo = cached || DEFAULT_DARK_LOGO;
     }
 });
+
+const logoUrl = computed(() => normalizeLogoUrl(settings.value?.dark_logo));
 
 const togglePassword = () => (showPassword.value = !showPassword.value);
 const toggleConfirmPassword = () =>

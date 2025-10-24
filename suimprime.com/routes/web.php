@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\MovieController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VastAdController;
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -146,6 +147,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('directors/{director}/edit', [DirectorController::class, 'edit'])->name('directors.edit');
     Route::put('directors/{director}', [DirectorController::class, 'update'])->name('directors.update');
     Route::delete('directors/{director}', [DirectorController::class, 'destroy'])->name('directors.destroy');
+
+    // VAST Ads
+    Route::get('vastads', [\App\Http\Controllers\Admin\VastAdController::class, 'index'])->name('vastads.index');
+    Route::get('vastads/get-targets', [\App\Http\Controllers\Admin\VastAdController::class, 'getTargets'])->name('vastads.getTargets');
+    Route::get('vastads/create', [\App\Http\Controllers\Admin\VastAdController::class, 'create'])->name('vastads.create');
+    Route::post('vastads', [\App\Http\Controllers\Admin\VastAdController::class, 'store'])->name('vastads.store');
+    Route::get('vastads/{vastAd}/edit', [\App\Http\Controllers\Admin\VastAdController::class, 'edit'])->name('vastads.edit');
+    Route::put('vastads/{vastAd}', [\App\Http\Controllers\Admin\VastAdController::class, 'update'])->name('vastads.update');
+    Route::delete('vastads/{vastAd}', [\App\Http\Controllers\Admin\VastAdController::class, 'destroy'])->name('vastads.destroy');
+    Route::post('vastads/bulk-action', [\App\Http\Controllers\Admin\VastAdController::class, 'bulkAction'])->name('vastads.bulkAction');
+    Route::patch('vastads/update-status/{vastAd}', [\App\Http\Controllers\Admin\VastAdController::class, 'updateStatus'])->name('vastads.updateStatus');
 });
 
 Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {

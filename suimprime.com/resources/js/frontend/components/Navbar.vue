@@ -20,9 +20,9 @@
                 <router-link to="/" class="navbar-brand">
                     <img
                         class="logo-normal dark-normal img-fluid logo"
-                        :src="settings.dark_logo"
+                        :src="logoUrl"
                         height="30"
-                        alt="Logo Dark"
+                        :alt="settings.app_name || 'Logo'"
                     />
                 </router-link>
             </div>
@@ -192,10 +192,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios, { setAuthToken } from "../axios";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import {
+    normalizeLogoUrl,
+    cacheDarkLogo,
+    readCachedDarkLogo,
+    DEFAULT_DARK_LOGO,
+} from "../helpers/logo";
 
 const router = useRouter();
 
@@ -214,16 +220,23 @@ const user = ref(null);
 // Settings state
 const settings = ref({
     app_name: "SuimPrime",
-    dark_logo: "/public/assets/logo/dark_logo.png",
+    // Default fallback points to public/assets/logo which is served at /assets/logo
+    dark_logo: "/assets/logo/dark_logo.png",
 });
+
+// Normalize logo URL from settings using shared helper
+const logoUrl = computed(() => normalizeLogoUrl(settings.value?.dark_logo));
 
 // Fetch settings on mount
 onMounted(async () => {
     try {
         const response = await axios.get("/api/settings");
         settings.value = response.data;
+        cacheDarkLogo(response?.data?.dark_logo || "");
     } catch (error) {
         console.error("Failed to load settings:", error);
+        const cached = readCachedDarkLogo();
+        settings.value.dark_logo = cached || DEFAULT_DARK_LOGO;
     }
 });
 
