@@ -1,5 +1,66 @@
 @extends('layouts.admin')
 @section('title', 'Create Movie')
+
+@push('styles')
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            background-color: var(--bs-dark-bg-subtle) !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #dc3545 !important;
+            border: 1px solid #dc3545 !important;
+            color: #ffffff !important;
+            border-radius: 4px !important;
+            line-height: 1.5 !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+            color: #ffffff !important;
+            background-color: #ff1d34bd !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #ffffff !important;
+            margin-right: 8px !important;
+        }
+
+        /* Dropdown panel */
+        .select2-dropdown,
+        .select2-results,
+        .select2-results__options {
+            background-color: var(--bs-dark-bg-subtle) !important;
+            /* dark bg */
+        }
+
+        /* Options default text */
+        .select2-container--default .select2-results__option {
+            color: var(--bs-body-color) !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #6b1017 !important;
+            color: #ffffff !important;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            background-color: var(--bs-dark-bg-subtle) !important;
+            border: 1px solid var(--bs-border-color) !important;
+            color: var(--bs-body-color) !important;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+@endpush
+
+
 @section('content')
     <div class="container-fluid">
         <!-- Breadcrumb -->
@@ -229,6 +290,24 @@
                 $('.video-inputs-container').each(function() {
                     handleQualityTypeChange($(this));
                 });
+
+                // Pre-select values for edit mode
+                @if (isset($movie))
+                    // Genres
+                    @if ($movie->genres->count() > 0)
+                        $('#genres').val([{!! $movie->genres->pluck('id')->map(fn($id) => "'" . $id . "'")->join(',') !!}]).trigger('change');
+                    @endif
+
+                    // Actors
+                    @if ($movie->actors->count() > 0)
+                        $('#actors').val([{!! $movie->actors->pluck('id')->map(fn($id) => "'" . $id . "'")->join(',') !!}]).trigger('change');
+                    @endif
+
+                    // Directors
+                    @if ($movie->directors->count() > 0)
+                        $('#directors').val([{!! $movie->directors->pluck('id')->map(fn($id) => "'" . $id . "'")->join(',') !!}]).trigger('change');
+                    @endif
+                @endif
             });
 
             function validateForm() {
@@ -467,104 +546,7 @@
             window.defaultCurrencySymbol = "$";
         </script>
         <script type="text/javascript">
-            /* document.addEventListener('DOMContentLoaded', function() {
-                                                                                                                                                                                                                                                                                                                                const form = document.getElementById('form-submit');
-                                                                                                                                                                                                                                                                                                                                const submitButton = document.getElementById('submit-button');
-                                                                                                                                                                                                                                                                                                                                const seoCheckbox = document.getElementById('enableSeoIntegration');
-                                                                                                                                                                                                                                                                                                                                const metaTitle = document.getElementById('meta_title');
-                                                                                                                                                                                                                                                                                                                                const metaTitleError = document.getElementById('meta_title_error');
-                                                                                                                                                                                                                                                                                                                                const hiddenInputsContainer = document.getElementById('meta_keywords_hidden_inputs');
-                                                                                                                                                                                                                                                                                                                                const errorMsg = document.getElementById('meta_keywords_error');
-                                                                                                                                                                                                                                                                                                                                const tagifyInput = document.getElementById('meta_keywords_input');
-                                                                                                                                                                                                                                                                                                                                const tagifyWrapper = tagifyInput ? tagifyInput.closest('.tagify') : null;
-                                                                                                                                                                                                                                                                                                                                const keywordInputs = hiddenInputsContainer ? hiddenInputsContainer.querySelectorAll(
-                                                                                                                                                                                                                                                                                                                                    'input[name="meta_keywords[]"]') : [];
-                                                                                                                                                                                                                                                                                                                                const googleVerification = document.getElementById('google_site_verification');
-                                                                                                                                                                                                                                                                                                                                const canonicalUrl = document.getElementById('canonical_url');
-                                                                                                                                                                                                                                                                                                                                const shortDescription = document.getElementById('short_description');
-                                                                                                                                                                                                                                                                                                                                const seoImage = document.getElementById('seo_image');
-                                                                                                                                                                                                                                                                                                                                const seoImagePreview = document.getElementById('selectedSeoImage');
-                                                                                                                                                                                                                                                                                                                                const seoImageError = document.querySelector('#seo_image_input + .invalid-feedback');
-
-                                                                                                                                                                                                                                                                                                                                const metaKeywordsError = document.getElementById('meta_keywords_error');
-                                                                                                                                                                                                                                                                                                                                let formSubmitted = false;
-                                                                                                                                                                                                                                                                                                                                if (form) {
-                                                                                                                                                                                                                                                                                                                                    const requiredFields = form.querySelectorAll('[required]');
-                                                                                                                                                                                                                                                                                                                                    if (requiredFields.length > 0) {
-                                                                                                                                                                                                                                                                                                                                        requiredFields.forEach(field => {
-                                                                                                                                                                                                                                                                                                                                            field.addEventListener('input', () => validateField(field));
-                                                                                                                                                                                                                                                                                                                                            field.addEventListener('change', () => validateField(field));
-                                                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                    form.addEventListener('submit', function(event) {
-                                                                                                                                                                                                                                                                                                                                        if (formSubmitted) {
-                                                                                                                                                                                                                                                                                                                                            event.preventDefault();
-                                                                                                                                                                                                                                                                                                                                            return;
-                                                                                                                                                                                                                                                                                                                                        }
-
-                                                                                                                                                                                                                                                                                                                                        let isValid = validateForm();
-
-                                                                                                                                                                                                                                                                                                                                        if (seoCheckbox && seoCheckbox.checked) {
-                                                                                                                                                                                                                                                                                                                                            if (!validateSeoImage()) {
-                                                                                                                                                                                                                                                                                                                                                event.preventDefault(); // stop form submit
-                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                            if (metaTitle && metaTitle.value === '') {
-                                                                                                                                                                                                                                                                                                                                                isValid = false;
-                                                                                                                                                                                                                                                                                                                                                metaTitle.classList.add('is-invalid');
-                                                                                                                                                                                                                                                                                                                                                if (metaTitleError) metaTitleError.style.display = 'block';
-                                                                                                                                                                                                                                                                                                                                            } else if (metaTitle) {
-                                                                                                                                                                                                                                                                                                                                                metaTitle.classList.remove('is-invalid');
-                                                                                                                                                                                                                                                                                                                                                if (metaTitleError) metaTitleError.style.display = 'none';
-                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                            // Tagify validation: check if it has tags
-                                                                                                                                                                                                                                                                                                                                            if (tagifyInput && tagifyInput.value === '') {
-                                                                                                                                                                                                                                                                                                                                                if (keywordInputs.length === 0) {
-                                                                                                                                                                                                                                                                                                                                                    isValid = false;
-
-                                                                                                                                                                                                                                                                                                                                                    // Show error message
-                                                                                                                                                                                                                                                                                                                                                    if (errorMsg) errorMsg.style.display = 'block';
-
-                                                                                                                                                                                                                                                                                                                                                    // Add visual error indication to Tagify input
-                                                                                                                                                                                                                                                                                                                                                    if (tagifyWrapper) {
-                                                                                                                                                                                                                                                                                                                                                        tagifyWrapper.classList.add('is-invalid');
-                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                } else {
-                                                                                                                                                                                                                                                                                                                                                    const tagifyInputValue = tagifyInput.value;
-                                                                                                                                                                                                                                                                                                                                                    const keywordValues = tagifyInputValue.map(item => item.value);
-                                                                                                                                                                                                                                                                                                                                                    const metaKeywordsInput = document.getElementById('meta_keywords_input');
-                                                                                                                                                                                                                                                                                                                                                    if (metaKeywordsInput) metaKeywordsInput.value = JSON.stringify(
-                                                                                                                                                                                                                                                                                                                                                        keywordValues);
-                                                                                                                                                                                                                                                                                                                                                    // Hide error if input is valid
-                                                                                                                                                                                                                                                                                                                                                    if (errorMsg) errorMsg.style.display = 'none';
-                                                                                                                                                                                                                                                                                                                                                    if (tagifyWrapper) {
-                                                                                                                                                                                                                                                                                                                                                        tagifyWrapper.classList.remove('is-invalid');
-                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                            } else if (tagifyInput) {
-                                                                                                                                                                                                                                                                                                                                                if (errorMsg) errorMsg.style.display = 'none';
-                                                                                                                                                                                                                                                                                                                                                if (tagifyWrapper) {
-                                                                                                                                                                                                                                                                                                                                                    tagifyWrapper.classList.remove('is-invalid');
-                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                        }
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                        if (!isValid) {
-                                                                                                                                                                                                                                                                                                                                            event.preventDefault();
-                                                                                                                                                                                                                                                                                                                                            submitButton.disabled = false;
-                                                                                                                                                                                                                                                                                                                                            formSubmitted = false; // Reset the flag
-                                                                                                                                                                                                                                                                                                                                            return;
-                                                                                                                                                                                                                                                                                                                                        }
-
-                                                                                                                                                                                                                                                                                                                                        submitButton.disabled = true;
-                                                                                                                                                                                                                                                                                                                                        submitButton.innerText = 'Loading...';
-                                                                                                                                                                                                                                                                                                                                        formSubmitted = true;
-                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                            }); */
+            });*/
             document.addEventListener('DOMContentLoaded', function() {
                 flatpickr('.min-datetimepicker-time', {
                     enableTime: true,
@@ -715,12 +697,45 @@
                 document.getElementById('total_amount').value = total.toFixed(2);
             }
 
+            function validatePayPerView() {
+                const purchaseType = document.querySelector('select[name="purchase_type"]').value;
+                const accessDuration = parseInt(document.querySelector('input[name="access_duration"]').value) || 0;
+                const availableFor = parseInt(document.querySelector('input[name="available_for"]').value) || 0;
+                const accessDurationError = document.getElementById('access_duration-error');
+                const availableForError = document.getElementById('available_for-error');
+
+                // Reset error states
+                accessDurationError.textContent = 'Access Duration field is required';
+                availableForError.textContent = 'Available For field is required';
+
+                if (purchaseType === 'rental' && accessDuration > 0 && availableFor > 0) {
+                    if (availableFor <= accessDuration) {
+                        availableForError.textContent = 'Available For must be greater than Access Duration';
+                        availableForError.style.display = 'block';
+                        document.querySelector('input[name="available_for"]').classList.add('is-invalid');
+                        return false;
+                    } else {
+                        availableForError.style.display = 'none';
+                        document.querySelector('input[name="available_for"]').classList.remove('is-invalid');
+                    }
+                }
+                return true;
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
                 const priceInput = document.querySelector('input[name="price"]');
                 const discountInput = document.querySelector('input[name="discount"]');
+                const accessDurationInput = document.querySelector('input[name="access_duration"]');
+                const availableForInput = document.querySelector('input[name="available_for"]');
+                const purchaseTypeSelect = document.querySelector('select[name="purchase_type"]');
 
-                priceInput.addEventListener('input', calculateTotal);
-                discountInput.addEventListener('input', calculateTotal);
+                if (priceInput) priceInput.addEventListener('input', calculateTotal);
+                if (discountInput) discountInput.addEventListener('input', calculateTotal);
+
+                // Add validation listeners for Pay Per View
+                if (accessDurationInput) accessDurationInput.addEventListener('input', validatePayPerView);
+                if (availableForInput) availableForInput.addEventListener('input', validatePayPerView);
+                if (purchaseTypeSelect) purchaseTypeSelect.addEventListener('change', validatePayPerView);
 
                 // Trigger initial calculation if old values exist
                 calculateTotal();
@@ -1073,7 +1088,6 @@
                 }
             });
         </script>
-        ///////////////////////////// Form Submit /////////////////////////////
         <script type="text/javascript">
             $(document).ready(function() {
                 console.log('Document ready - initializing TMDB import functionality'); // Debug log
@@ -1212,7 +1226,10 @@
                                 Object.entries(map).forEach(([id, name]) => {
                                     if ($sel.find(`option[value="${id}"]`).length ===
                                         0) {
-                                        const opt = new Option(name, id, false, false);
+                                        const trimmedName = (name || '').toString()
+                                            .trim();
+                                        const opt = new Option(trimmedName, id, false,
+                                            false);
                                         $sel.append(opt);
                                     }
                                 });
@@ -1236,7 +1253,8 @@
                                 idsStr.forEach(id => {
                                     if ($sel.find(`option[value="${id}"]`).length ===
                                         0) {
-                                        const name = (labelMap && labelMap[id]) || id;
+                                        const name = ((labelMap && labelMap[id]) || id)
+                                            .toString().trim();
                                         $sel.append(new Option(name, id, false, false));
                                     }
                                 });

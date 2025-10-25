@@ -12,7 +12,7 @@ class Movie extends Model
     protected $fillable = [
         'title', 'description', 'release_date', 'language', 'IMDb_rating', 'content_rating', 'duration',
         'video_upload_type', 'video_url', 'video_file', 'embed_code', 'enable_quality', 'enable_subtitle',
-        'plan_id', 'status', 'is_restricted',
+        'plan_id', 'status', 'is_restricted', 'download_status', 'download_url', 'movie_access',
     ];
 
     protected $casts = [
@@ -48,6 +48,12 @@ class Movie extends Model
     public function subtitles()
     {
         return $this->hasMany(MovieSubtitle::class);
+    }
+
+    // 🔹 Pay Per View
+    public function payPerView()
+    {
+        return $this->hasOne(MoviePayPerView::class);
     }
 
     public function media()

@@ -119,11 +119,25 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ $movie->likes_count }}</td>
-                                    <td>{{ $movie->watch_count }}</td>
-                                    <td><span class="badge bg-info-subtle p-2">{{ $movie->access_type }}</span></td>
-                                    <td>{{ $movie->plan ?? '-' }}</td>
-                                    <td>{{ $movie->language }}</td>
+                                    <td>{{ $movie->likes_count ?? 0 }}</td>
+                                    <td>{{ $movie->watches_count ?? 0 }}</td>
+                                    <td>
+                                        @if ($movie->movie_access === 'paid')
+                                            <span class="badge bg-success p-2">Paid</span>
+                                        @elseif($movie->movie_access === 'pay-per-view')
+                                            <span class="badge bg-warning p-2">Pay Per View</span>
+                                        @else
+                                            <span class="badge bg-info p-2">Free</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($movie->movie_access === 'paid' && $movie->plan)
+                                            {{ $movie->plan->name ?? '-' }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>{{ ucfirst($movie->language) ?? '-' }}</td>
                                     <td>
                                         <div class="form-check form-switch">
                                             <input type="checkbox"

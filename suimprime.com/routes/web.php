@@ -85,18 +85,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // admin.movies.create
     Route::get('movies/create', [MovieController::class, 'create'])->name('movies.create');
     // admin.movie.edit
-    Route::get('movies/{movies}/edit', [MovieController::class, 'edit'])->name('movies.edit');
+    Route::get('movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
     // Update Restiricted
     Route::put('movies/{movie}/restricted', [MovieController::class, 'updateRestricted'])->name('movies.updateRestricted');
     // admin.movie.destroy
-    Route::delete('movies/{movies}', [MovieController::class, 'destroy'])->name('movies.destroy');
+    Route::delete('movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
     // admin.movie.store
     Route::post('movies', [MovieController::class, 'store'])->name('movies.store');
     // admin.movie.update
-    Route::put('movies/{movies}', [MovieController::class, 'update'])->name('movies.update');
+    Route::put('movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
     // admin.movie.bulkAction
     Route::post('movies/bulk-action', [GenreController::class, 'bulkAction'])->name('movies.bulkAction');
-    Route::patch('movies/update-status/{movies}', [GenreController::class, 'updateStatus'])->name('movies.updateStatus');
+    Route::patch('movies/update-status/{movie}', [GenreController::class, 'updateStatus'])->name('movies.updateStatus');
 
     // Plans
     Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
