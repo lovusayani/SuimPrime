@@ -183,6 +183,12 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::post('/settings/storage-settings', [SettingsController::class, 'updateStorageSettings'])->name('admin.settings.storage.update');
     Route::get('/settings/seo-settings', [SettingsController::class, 'seoSettings'])->name('admin.settings.seoSettings');
     Route::post('/settings/seo-settings', [SettingsController::class, 'updateSeoSettings'])->name('admin.settings.seo.update');
+    Route::get('/settings/admin-settings', [SettingsController::class, 'admSettings'])->name('admin.settings.admSettings');
+    Route::post('/settings/admin-settings', [SettingsController::class, 'updateAdmSettings'])->name('admin.settings.adm.update');
+    Route::get('/settings/content-settings', [SettingsController::class, 'contentSettings'])->name('admin.settings.contentSettings');
+    Route::post('/settings/content-settings', [SettingsController::class, 'updateContentSettings'])->name('admin.settings.content.update');
+    Route::get('/settings/database-settings', [SettingsController::class, 'databaseSettings'])->name('admin.settings.databaseSettings');
+    Route::post('/settings/database-settings', [SettingsController::class, 'updateDatabaseSettings'])->name('admin.settings.database.update');
 
     // TMDB Routes
     Route::get('/tmdb', [\App\Http\Controllers\Admin\TmdbController::class, 'index'])->name('admin.tmdb.index');

@@ -181,11 +181,36 @@ class SettingsController extends Controller
             'expiry_plan' => 'required|numeric|min:0',
             'upcoming' => 'required|numeric|min:0',
             'continue_watch' => 'required|numeric|min:0',
+            // Additional notification settings validation
+            'admin_notification_email' => 'nullable|email',
+            'email_notifications_enabled' => 'nullable|boolean',
+            'push_notifications_enabled' => 'nullable|boolean',
+            'sms_notifications_enabled' => 'nullable|boolean',
+            'notification_frequency' => 'nullable|string|in:realtime,hourly,daily,weekly',
+            'maintenance_notification_message' => 'nullable|string|max:500',
         ]);
 
+        // Save existing notification configuration settings
         Setting::set('expiry_plan', $request->input('expiry_plan'));
         Setting::set('upcoming', $request->input('upcoming'));
         Setting::set('continue_watch', $request->input('continue_watch'));
+
+        // Save additional notification & communication settings if provided
+        if ($request->filled('admin_notification_email')) {
+            Setting::set('admin_notification_email', $request->input('admin_notification_email'));
+        }
+        
+        Setting::set('email_notifications_enabled', $request->has('email_notifications_enabled') ? '1' : '0');
+        Setting::set('push_notifications_enabled', $request->has('push_notifications_enabled') ? '1' : '0');
+        Setting::set('sms_notifications_enabled', $request->has('sms_notifications_enabled') ? '1' : '0');
+        
+        if ($request->filled('notification_frequency')) {
+            Setting::set('notification_frequency', $request->input('notification_frequency'));
+        }
+        
+        if ($request->filled('maintenance_notification_message')) {
+            Setting::set('maintenance_notification_message', $request->input('maintenance_notification_message'));
+        }
 
         return redirect()->route('admin.settings.notificationConfiguration')->with('success', 'Notification configuration updated successfully.');
     }
@@ -434,5 +459,114 @@ class SettingsController extends Controller
         }
 
         return redirect()->back()->with('success', 'Settings updated successfully.');
+    }
+
+    public function admSettings()
+    {
+        return view('admin.settings.admsettings');
+    }
+
+    public function updateAdmSettings(Request $request)
+    {
+        // Validate admin settings
+        $request->validate([
+            'max_users_allowed' => 'nullable|integer|min:1',
+            'user_registration_enabled' => 'nullable|boolean',
+            'email_verification_required' => 'nullable|boolean',
+            'default_user_role' => 'nullable|string|in:user,premium,admin',
+            'login_rate_limit' => 'nullable|integer|min:1|max:100',
+            'session_timeout_minutes' => 'nullable|integer|min:5|max:1440',
+            'enable_2fa' => 'nullable|boolean',
+            'cache_timeout_hours' => 'nullable|integer|min:1|max:168',
+            'maintenance_mode' => 'nullable|boolean',
+        ]);
+
+        // Save User Management Settings
+        if ($request->has('max_users_allowed')) {
+            Setting::set('max_users_allowed', $request->input('max_users_allowed', '1000'));
+        }
+        Setting::set('user_registration_enabled', $request->has('user_registration_enabled') ? '1' : '0');
+        Setting::set('email_verification_required', $request->has('email_verification_required') ? '1' : '0');
+        if ($request->filled('default_user_role')) {
+            Setting::set('default_user_role', $request->input('default_user_role', 'user'));
+        }
+
+        // Save Security & Performance Settings
+        if ($request->has('login_rate_limit')) {
+            Setting::set('login_rate_limit', $request->input('login_rate_limit', '5'));
+        }
+        if ($request->has('session_timeout_minutes')) {
+            Setting::set('session_timeout_minutes', $request->input('session_timeout_minutes', '120'));
+        }
+        Setting::set('enable_2fa', $request->has('enable_2fa') ? '1' : '0');
+        if ($request->has('cache_timeout_hours')) {
+            Setting::set('cache_timeout_hours', $request->input('cache_timeout_hours', '24'));
+        }
+        Setting::set('maintenance_mode', $request->has('maintenance_mode') ? '1' : '0');
+
+        return redirect()->route('admin.settings.admSettings')->with('success', 'Admin settings updated successfully.');
+    }
+
+    public function contentSettings()
+    {
+        return view('admin.settings.content-settings');
+    }
+
+    public function updateContentSettings(Request $request)
+    {
+        // Validate content settings
+        $request->validate([
+            'auto_approve_content' => 'nullable|boolean',
+            'max_file_size_mb' => 'nullable|integer|min:1|max:2048',
+            'allowed_video_formats' => 'nullable|string',
+            'content_moderation_enabled' => 'nullable|boolean',
+            'default_video_quality' => 'nullable|string|in:480p,720p,1080p,4k',
+            'enable_content_comments' => 'nullable|boolean',
+            'enable_content_ratings' => 'nullable|boolean',
+            'content_per_page' => 'nullable|integer|min:1|max:100',
+            'allowed_image_formats' => 'nullable|string',
+            'enable_content_watermark' => 'nullable|boolean',
+            'auto_generate_thumbnails' => 'nullable|boolean',
+        ]);
+
+        // Save Content Management Settings
+        Setting::set('auto_approve_content', $request->has('auto_approve_content') ? '1' : '0');
+        if ($request->has('max_file_size_mb')) {
+            Setting::set('max_file_size_mb', $request->input('max_file_size_mb', '500'));
+        }
+        if ($request->filled('allowed_video_formats')) {
+            Setting::set('allowed_video_formats', $request->input('allowed_video_formats', 'mp4,mkv,avi,mov'));
+        }
+        Setting::set('content_moderation_enabled', $request->has('content_moderation_enabled') ? '1' : '0');
+
+        // Save Additional Content Settings
+        if ($request->filled('default_video_quality')) {
+            Setting::set('default_video_quality', $request->input('default_video_quality', '720p'));
+        }
+        Setting::set('enable_content_comments', $request->has('enable_content_comments') ? '1' : '0');
+        Setting::set('enable_content_ratings', $request->has('enable_content_ratings') ? '1' : '0');
+        if ($request->has('content_per_page')) {
+            Setting::set('content_per_page', $request->input('content_per_page', '12'));
+        }
+        if ($request->filled('allowed_image_formats')) {
+            Setting::set('allowed_image_formats', $request->input('allowed_image_formats', 'jpg,jpeg,png,webp,gif'));
+        }
+        Setting::set('enable_content_watermark', $request->has('enable_content_watermark') ? '1' : '0');
+        Setting::set('auto_generate_thumbnails', $request->has('auto_generate_thumbnails') ? '1' : '0');
+
+        return redirect()->route('admin.settings.contentSettings')->with('success', 'Content settings updated successfully.');
+    }
+
+    public function databaseSettings()
+    {
+        return view('admin.settings.database-settings');
+    }
+
+    public function updateDatabaseSettings(Request $request)
+    {
+        // This method is placeholder for future database settings functionality
+        // Validation and processing will be added when specific database settings are implemented
+        
+        return redirect()->route('admin.settings.databaseSettings')->with('success', 'Database settings updated successfully.');
     }
 }

@@ -16,14 +16,17 @@ class MovieController extends Controller
 {
     public function index()
     {
-        // $movies = Movie::orderBy('created_at', 'desc')->paginate(10);
-        $movies = Movie::with(['posterTvDetails', 'genres'])->paginate(10);
+        // Optimize query with select and limited eager loading
+        $movies = Movie::select(['id', 'title', 'description', 'release_date', 'status', 'created_at', 'updated_at'])
+            ->with(['posterTvDetails:id,movie_id,thumbnail', 'genres:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-        // get genres
-        $genres = Genre::all();
-        $actors = Actor::all();
-        $directors = Director::all();
-
+        // Cache genres, actors, directors for better performance
+        $genres = cache()->remember('admin_genres', 3600, function () {
+            return Genre::select(['id', 'name'])->get();
+        });
+        
         return view('admin.movies.index', compact('movies', 'genres'));
     }
 
@@ -89,7 +92,8 @@ class MovieController extends Controller
                             'mediable_type' => null,
                         ]);
                     }
-                    return [url('/storage/media/' . $filename), $relative];
+                    // Store relative path instead of full URL
+                    return ['/storage/media/' . $filename, $relative];
                 }
 
                 // Move file in public disk
@@ -109,7 +113,8 @@ class MovieController extends Controller
                         'mediable_type' => null,
                     ]);
                 }
-                $publicUrl = url('/storage/media/' . $filename);
+                // Store relative path instead of full URL
+                $publicUrl = '/storage/media/' . $filename;
                 return [ $publicUrl, $relative ];
             };
 
@@ -165,7 +170,8 @@ class MovieController extends Controller
                     if ($uploadedFile) {
                         // Store under public/subtitles and expose via storage symlink
                         $storedPath = $uploadedFile->store('subtitles', 'public');
-                        $storedUrl = url('/storage/' . $storedPath);
+                        // Store relative path instead of full URL
+                        $storedUrl = '/storage/' . $storedPath;
                     }
 
                     // Create subtitle record; DB expects non-null language, but file may be nullable
