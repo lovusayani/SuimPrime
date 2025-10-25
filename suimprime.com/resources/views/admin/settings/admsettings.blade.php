@@ -35,7 +35,7 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <h4 class="card-title">
-                        <i class="fas fa-users me-2"></i>User Management Settings
+                        <i class="ph ph-users me-2"></i>User Management Settings
                     </h4>
                 </div>
                 <div class="card-body">
@@ -104,7 +104,7 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <h4 class="card-title">
-                        <i class="fas fa-shield-alt me-2"></i>Security & Performance Settings
+                        <i class="ph ph-shield me-2"></i>Security & Performance Settings
                     </h4>
                 </div>
                 <div class="card-body">

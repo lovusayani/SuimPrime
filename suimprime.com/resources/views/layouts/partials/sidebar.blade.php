@@ -241,7 +241,7 @@
                     <a class="nav-link" href="{{ route('admin.planlimitation.index') }}">
                         <i class='icon ph ph-warning-octagon' data-bs-toggle="tooltip" data-bs-placement="right"
                             aria-label="Planlimitation" data-bs-original-title="Planlimitation"></i><span
-                            class='item-name'>Planlimitation</span><i class='icon '></i>
+                            class='item-name'>Plan Limit</span><i class='icon '></i>
                     </a>
                 </li>
                 <li class="nav-item">

@@ -6,7 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Setting;
 use App\Models\Currency;
+use App\Models\Movie;
+use App\Models\Actor;
+use App\Models\Director;
+use App\Models\Genre;
+use App\Models\MoviePosterTv;
+use App\Models\MovieQuality;
+use App\Models\MovieSubtitle;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class SettingsController extends Controller
 {
@@ -568,5 +578,209 @@ class SettingsController extends Controller
         // Validation and processing will be added when specific database settings are implemented
         
         return redirect()->route('admin.settings.databaseSettings')->with('success', 'Database settings updated successfully.');
+    }
+
+    public function getCount($type)
+    {
+        try {
+            $count = 0;
+            
+            switch ($type) {
+                case 'movies':
+                    $count = Movie::count();
+                    break;
+                case 'actors':
+                    $count = Actor::count();
+                    break;
+                case 'directors':
+                    $count = Director::count();
+                    break;
+                case 'genres':
+                    $count = Genre::count();
+                    break;
+                default:
+                    return response()->json(['error' => 'Invalid type'], 400);
+            }
+
+            return response()->json(['count' => $count]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to get count'], 500);
+        }
+    }
+
+    public function deleteAll($type)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $deletedCount = 0;
+            $message = '';
+
+            switch ($type) {
+                case 'movies':
+                    $deletedCount = $this->deleteAllMovies();
+                    $message = "Successfully deleted {$deletedCount} movies and all related data.";
+                    break;
+                    
+                case 'actors':
+                    $deletedCount = $this->deleteAllActors();
+                    $message = "Successfully deleted {$deletedCount} actors and their images.";
+                    break;
+                    
+                case 'directors':
+                    $deletedCount = $this->deleteAllDirectors();
+                    $message = "Successfully deleted {$deletedCount} directors and their images.";
+                    break;
+                    
+                case 'genres':
+                    $deletedCount = $this->deleteAllGenres();
+                    $message = "Successfully deleted {$deletedCount} genres.";
+                    break;
+                    
+                default:
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Invalid type'], 400);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => $message]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Database deletion error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Deletion failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteAllMovies()
+    {
+        $count = Movie::count();
+        
+        // Get all movie poster/tv records to delete images
+        if (Schema::hasTable('movie_posters_tv')) {
+            $posterTvRecords = MoviePosterTv::all();
+            foreach ($posterTvRecords as $record) {
+                $this->deleteImageFile($record->thumbnail);
+                $this->deleteImageFile($record->poster);
+                $this->deleteImageFile($record->poster_tv);
+            }
+        }
+        
+        // Delete all related data first (foreign key constraints)
+        if (Schema::hasTable('movie_posters_tv')) {
+            MoviePosterTv::truncate();
+        }
+        if (Schema::hasTable('movie_qualities')) {
+            MovieQuality::truncate();
+        }
+        if (Schema::hasTable('movie_subtitles')) {
+            MovieSubtitle::truncate();
+        }
+        
+        // Delete pivot table relationships
+        if (Schema::hasTable('movie_actor')) {
+            DB::table('movie_actor')->truncate();
+        }
+        if (Schema::hasTable('movie_director')) {
+            DB::table('movie_director')->truncate();
+        }
+        if (Schema::hasTable('movie_genre')) {
+            DB::table('movie_genre')->truncate();
+        }
+        
+        // Finally delete movies
+        if (Schema::hasTable('movies')) {
+            Movie::truncate();
+        }
+        
+        return $count;
+    }
+
+    private function deleteAllActors()
+    {
+        $count = Actor::count();
+        
+        // Get all actors to delete their images
+        if (Schema::hasTable('actors')) {
+            $actors = Actor::all();
+            foreach ($actors as $actor) {
+                $this->deleteImageFile($actor->image);
+            }
+        }
+        
+        // Delete pivot relationships
+        if (Schema::hasTable('movie_actor')) {
+            DB::table('movie_actor')->truncate();
+        }
+        
+        // Delete actors
+        if (Schema::hasTable('actors')) {
+            Actor::truncate();
+        }
+        
+        return $count;
+    }
+
+    private function deleteAllDirectors()
+    {
+        $count = Director::count();
+        
+        // Get all directors to delete their images
+        if (Schema::hasTable('directors')) {
+            $directors = Director::all();
+            foreach ($directors as $director) {
+                $this->deleteImageFile($director->image);
+            }
+        }
+        
+        // Delete pivot relationships
+        if (Schema::hasTable('movie_director')) {
+            DB::table('movie_director')->truncate();
+        }
+        
+        // Delete directors
+        if (Schema::hasTable('directors')) {
+            Director::truncate();
+        }
+        
+        return $count;
+    }
+
+    private function deleteAllGenres()
+    {
+        $count = Genre::count();
+        
+        // Delete pivot relationships
+        if (Schema::hasTable('movie_genre')) {
+            DB::table('movie_genre')->truncate();
+        }
+        
+        // Delete genres
+        if (Schema::hasTable('genres')) {
+            Genre::truncate();
+        }
+        
+        return $count;
+    }
+
+    private function deleteImageFile($imagePath)
+    {
+        if (empty($imagePath)) {
+            return;
+        }
+        
+        // Handle both relative and absolute paths
+        if (strpos($imagePath, '/storage/') === 0) {
+            // Remove /storage/ prefix to get the actual storage path
+            $storagePath = str_replace('/storage/', '', $imagePath);
+            if (Storage::disk('public')->exists($storagePath)) {
+                Storage::disk('public')->delete($storagePath);
+            }
+        } elseif (strpos($imagePath, 'storage/') === 0) {
+            // Already in storage format
+            if (Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
     }
 }

@@ -38,10 +38,10 @@
                             data-toggle="validator" id="form-submit" novalidate="novalidate" enctype="multipart/form-data">
                             @csrf
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4><i class="fas fa-cube"></i> Business Settings</h4>
+                                <h4><i class="ph ph-buildings"></i> Business Settings</h4>
                                 <div>
                                     <button type="button" class="btn btn-primary float-right" onclick="clearCache()">
-                                        <i class="fa-solid fa-arrow-rotate-left mx-2"></i>Purge Cache
+                                        <i class="ph ph-arrow-clockwise mx-2"></i>Purge Cache
                                     </button>
                                 </div>
                             </div>
@@ -174,7 +174,7 @@
                         <div class="card card-accent-primary offcanvas-body mb-0">
                             <div class="card-body">
                                 <div class="col-md-12 mb-3 d-flex justify-content-between">
-                                    <h5><i class="fa-solid fa-sliders"></i> Module Settings</h5>
+                                    <h5><i class="ph ph-sliders"></i> Module Settings</h5>
                                 </div>
 
                                 <form method="POST" action="{{ route('admin.settings.logo.update') }}"

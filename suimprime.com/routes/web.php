@@ -60,7 +60,7 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('media-library', [MediaController::class, 'index'])->name('media.index');
-    Route::get('/getMediaStore', [MediaController::class, 'getMedia'])->name('media.library');
+    Route::get('/getMediaStore', [MediaController::class, 'getMedia'])->name('media.library.store');
     Route::get('/get-media', [MediaController::class, 'getMedia'])->name('media.library');
     Route::post('media-library/upload', [MediaController::class, 'upload'])->name('media-library.upload');
     Route::post('media-library/store', [MediaController::class, 'store'])->name('media-library.store');
@@ -189,6 +189,10 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::post('/settings/content-settings', [SettingsController::class, 'updateContentSettings'])->name('admin.settings.content.update');
     Route::get('/settings/database-settings', [SettingsController::class, 'databaseSettings'])->name('admin.settings.databaseSettings');
     Route::post('/settings/database-settings', [SettingsController::class, 'updateDatabaseSettings'])->name('admin.settings.database.update');
+    
+    // Database Management Routes
+    Route::get('/database/count/{type}', [SettingsController::class, 'getCount'])->name('admin.database.count');
+    Route::delete('/database/delete-all/{type}', [SettingsController::class, 'deleteAll'])->name('admin.database.deleteAll');
 
     // TMDB Routes
     Route::get('/tmdb', [\App\Http\Controllers\Admin\TmdbController::class, 'index'])->name('admin.tmdb.index');

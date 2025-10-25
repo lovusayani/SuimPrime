@@ -10,9 +10,9 @@ class Movie extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'release_date', 'video_upload_type', 'video_url',
-        'video_file', 'embed_code', 'enable_quality', 'enable_subtitle',
-        'plan_id', 'status',
+        'title', 'description', 'release_date', 'language', 'IMDb_rating', 'content_rating', 'duration',
+        'video_upload_type', 'video_url', 'video_file', 'embed_code', 'enable_quality', 'enable_subtitle',
+        'plan_id', 'status', 'is_restricted',
     ];
 
     protected $casts = [
@@ -25,6 +25,12 @@ class Movie extends Model
     public function posterTvDetails()
     {
         return $this->hasOne(MoviePosterTv::class, 'movie_id');
+    }
+
+    // 🔹 SEO Settings
+    public function seoSettings()
+    {
+        return $this->hasOne(MovieSeoSetting::class, 'movie_id');
     }
 
     public function getThumbnailAttribute()

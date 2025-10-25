@@ -16,7 +16,7 @@
                         @csrf
                         <div class="card">
                             <div class="card-header">
-                                <h4><i class="fa-solid fa-bell"></i> Notification Configuration</h4>
+                                <h4><i class="ph ph-bell"></i> Notification Configuration</h4>
                             </div>
                             <div class="card-body">
                                 <div class="row gy-3">

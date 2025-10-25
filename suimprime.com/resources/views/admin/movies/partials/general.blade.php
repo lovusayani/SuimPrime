@@ -246,10 +246,9 @@
                 <label class="form-label" for="type">Plan<span class="text-danger"> *</span></label>
                 <select class="form-control select2" name="plan_id" id="plan_id">
                     <option value>Select Plan</option>
-                    <option value="1">Basic</option>
-                    <option value="2">Premium Plan</option>
-                    <option value="3">Ultimate Plan</option>
-                    <option value="4">Elite Plan</option>
+                    <option value="5">Basic</option>
+                    <option value="6">Premium Plan</option>
+                    <option value="7">Ultimate Plan</option>
                 </select>
                 <div class="invalid-feedback" id="name-error">Plan field is required</div>
             </div>

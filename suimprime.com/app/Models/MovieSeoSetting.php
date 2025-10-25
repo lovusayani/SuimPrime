@@ -8,6 +8,10 @@ class MovieSeoSetting extends Model
 {
     protected $fillable = ['movie_id','seo_image','meta_title','google_site_verification','meta_keywords','canonical_url','short_description'];
 
+    protected $casts = [
+        'meta_keywords' => 'array',
+    ];
+
     public function movie()
     {
         return $this->belongsTo(Movie::class);

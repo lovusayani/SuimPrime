@@ -7,6 +7,8 @@ use App\Models\Actor;
 use App\Models\Director;
 use App\Models\Genre;
 use App\Models\Movie;
+use App\Models\MoviePosterTv;
+use App\Models\MovieSeoSetting;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +46,11 @@ class MovieController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'release_date' => 'nullable|date',
+            'language' => 'nullable|string',
+            'IMDb_rating' => 'nullable|numeric',
+            'content_rating' => 'nullable|string',
+            'duration' => 'nullable|string',
             'video_upload_type' => 'required|string',
             'video_url' => 'nullable|string',
             'video_file' => 'nullable|string',
@@ -55,17 +62,25 @@ class MovieController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Create Movie
-            $movie = Movie::create([
-                'title' => $request->name,
-                'description' => $request->description,
-                'video_upload_type' => $request->video_upload_type,
-                'video_url' => $request->video_url_input,
-                'video_file' => $request->video_file_input,
-                'embed_code' => $request->embedded,
-                'enable_quality' => $request->enable_quality ?? 0,
-                'enable_subtitle' => $request->enable_subtitle ?? 0,
-            ]);
+            // 1. Save basic movie data
+        $movie = Movie::create([
+            'title' => $request->name,
+            'description' => $request->description,
+            'release_date' => $request->release_date,
+            'language' => $request->language,
+            'content_rating' => $request->content_rating,
+            'IMDb_rating' => $request->IMDb_rating,
+            'duration' => $request->duration,
+            'is_restricted' => $request->is_restricted ?? 0,
+            'video_upload_type' => $request->video_upload_type,
+            'video_url' => $request->video_url,
+            'video_file' => $request->video_file,
+            'embed_code' => $request->embed_code,
+            'enable_quality' => $request->enable_quality ?? 0,
+            'enable_subtitle' => $request->enable_subtitle ?? 0,
+            'status' => $request->status ?? 1,
+            'plan_id' => $request->plan_id ?: null, // Use null if empty
+        ]);
 
             // Move images from temp_uploads to media and register media rows; return public URL
             $processMediaUrl = function ($inputUrl) {
@@ -184,14 +199,20 @@ class MovieController extends Controller
             }
 
             // 5. Save SEO Settings
-            if ($request->enable_seo) {
-                $movie->seo()->create([
+            if ($request->enable_seo || $request->meta_title || $request->meta_keywords || $request->meta_description) {
+                // Convert meta_keywords string to array (split by comma)
+                $metaKeywords = null;
+                if ($request->meta_keywords) {
+                    $metaKeywords = array_map('trim', explode(',', $request->meta_keywords));
+                }
+                
+                $movie->seoSettings()->create([
                     'seo_image' => $request->seo_image,
                     'meta_title' => $request->meta_title,
                     'google_site_verification' => $request->google_site_verification,
-                    'meta_keywords' => json_encode($request->meta_keywords),
+                    'meta_keywords' => $metaKeywords,
                     'canonical_url' => $request->canonical_url,
-                    'short_description' => $request->short_description,
+                    'short_description' => $request->meta_description,
                 ]);
             }
 

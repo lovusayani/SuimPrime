@@ -35,7 +35,7 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">
-                        <i class="fas fa-film me-2"></i>Content Management Settings
+                        <i class="ph ph-film-strip me-2"></i>Content Management Settings
                     </h4>
                 </div>
                 <div class="card-body">
