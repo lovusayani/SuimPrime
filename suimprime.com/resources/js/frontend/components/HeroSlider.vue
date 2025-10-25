@@ -14,7 +14,11 @@
                 v-for="(movie, index) in movies"
                 :key="index"
                 class="hero-slide"
-                :style="{ backgroundImage: `url(${movie.image})` }"
+                :style="{
+                    backgroundImage: `url(${
+                        movie.poster_url || movie.thumbnail_url
+                    })`,
+                }"
             >
                 <!-- dark overlay -->
                 <div class="overlay"></div>
@@ -25,8 +29,8 @@
                 <!-- content -->
                 <div class="slide-content container">
                     <ul class="tags">
-                        <li v-for="(tag, i) in movie.tags" :key="i">
-                            {{ tag }}
+                        <li v-for="genre in movie.genres" :key="genre.id">
+                            {{ genre.name }}
                         </li>
                     </ul>
 
@@ -34,10 +38,17 @@
                     <p class="desc">{{ movie.description }}</p>
 
                     <ul class="meta">
-                        <li>{{ movie.year }}</li>
-                        <li>🌐 {{ movie.language }}</li>
-                        <li>⏱️ {{ movie.duration }}</li>
-                        <li>⭐ {{ movie.rating }} (IMDB)</li>
+                        <li>
+                            {{
+                                new Date(movie.release_date).getFullYear() ||
+                                "N/A"
+                            }}
+                        </li>
+                        <li>🌐 English</li>
+                        <li>⏱️ {{ formatDuration(movie.duration) }}</li>
+                        <li v-if="movie.imdb_rating">
+                            ⭐ {{ movie.imdb_rating }} (IMDB)
+                        </li>
                     </ul>
 
                     <div class="actions">
@@ -57,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
@@ -65,37 +76,53 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 import { PhCheck, PhPlus } from "@phosphor-icons/vue";
+import axios from "../axios";
 
-const movies = ref([
-    {
-        title: "The Smiling Shadows",
-        tags: ["Horror", "Action", "Comedy"],
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_smiling_shadows_poster.png",
-        description:
-            "A chilling tale where sinister smiles hide dark secrets and haunting mysteries.",
-        year: 2019,
-        language: "English",
-        duration: "05h 20m",
-        rating: 7.5,
-        inWatchlist: false,
-    },
-    {
-        title: "The Daring Player",
-        tags: ["Comedy", "Drama"],
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_daring_player_poster.png",
-        description:
-            "A hilarious and bold journey of a player who challenges his own destiny.",
-        year: 2019,
-        language: "Hindi",
-        duration: "02h 50m",
-        rating: 6.5,
-        inWatchlist: false,
-    },
-]);
+const movies = ref([]);
+
+const fetchHeroMovies = async () => {
+    try {
+        const response = await axios.get("/api/movies/section/recommended");
+        if (response.data.success) {
+            // Take first 3 movies for hero slider
+            movies.value = response.data.movies.slice(0, 3).map((movie) => ({
+                ...movie,
+                inWatchlist: false, // Initialize watchlist status
+            }));
+        }
+    } catch (error) {
+        console.error("Failed to fetch hero movies:", error);
+        // Fallback to sample data if API fails
+        movies.value = [
+            {
+                id: 1,
+                title: "Featured Movie",
+                description: "Discover amazing content on our platform.",
+                poster_url:
+                    "https://via.placeholder.com/1920x1080/333/fff?text=Featured+Movie",
+                release_date: "2024-01-01",
+                genres: [{ id: 1, name: "Action" }],
+                inWatchlist: false,
+            },
+        ];
+    }
+};
+
+const formatDuration = (minutes) => {
+    if (!minutes) return "N/A";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+};
 
 function toggleWatchlist(movie) {
     movie.inWatchlist = !movie.inWatchlist;
+    // TODO: Add API call to add/remove from watchlist
 }
+
+onMounted(() => {
+    fetchHeroMovies();
+});
 </script>
 
 <style scoped>

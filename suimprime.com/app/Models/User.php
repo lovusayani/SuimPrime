@@ -87,4 +87,41 @@ class User extends Authenticatable
         $activeSubscription = $this->activeSubscription;
         return $activeSubscription ? $activeSubscription->plan : null;
     }
+
+    /**
+     * User's watchlist
+     */
+    public function watchlist()
+    {
+        return $this->hasMany(UserWatchlist::class);
+    }
+
+    /**
+     * User's viewing history
+     */
+    public function viewingHistory()
+    {
+        return $this->hasMany(UserViewingHistory::class);
+    }
+
+    /**
+     * Movies in user's watchlist
+     */
+    public function watchlistMovies()
+    {
+        return $this->belongsToMany(Movie::class, 'user_watchlists')
+                    ->withTimestamps()
+                    ->orderBy('user_watchlists.created_at', 'desc');
+    }
+
+    /**
+     * Movies in user's viewing history
+     */
+    public function viewedMovies()
+    {
+        return $this->belongsToMany(Movie::class, 'user_viewing_history')
+                    ->withPivot(['watch_time', 'total_duration', 'progress_percentage', 'last_watched_at', 'completed'])
+                    ->withTimestamps()
+                    ->orderBy('user_viewing_history.last_watched_at', 'desc');
+    }
 }

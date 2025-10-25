@@ -10,9 +10,16 @@ class Movie extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'video_upload_type', 'video_url',
+        'title', 'description', 'release_date', 'video_upload_type', 'video_url',
         'video_file', 'embed_code', 'enable_quality', 'enable_subtitle',
         'plan_id', 'status',
+    ];
+
+    protected $casts = [
+        'release_date' => 'date',
+        'enable_quality' => 'boolean',
+        'enable_subtitle' => 'boolean',
+        'status' => 'boolean',
     ];
 
     public function posterTvDetails()
@@ -69,5 +76,39 @@ class Movie extends Model
     public function plan()
     {
         return $this->belongsTo(Plan::class);
+    }
+
+    // Accessor to get poster/thumbnail URL from video_url or default
+    public function getPosterUrlAttribute()
+    {
+        if ($this->video_upload_type === 'YouTube' && $this->video_url) {
+            // Extract YouTube video ID and get thumbnail
+            $videoId = $this->extractYouTubeId($this->video_url);
+            if ($videoId) {
+                return "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
+            }
+        }
+        // Fallback to existing thumbnail logic or placeholder
+        return $this->thumbnail ?? 'https://via.placeholder.com/300x450/333/fff?text=No+Poster';
+    }
+
+    public function getThumbnailUrlAttribute()
+    {
+        if ($this->video_upload_type === 'YouTube' && $this->video_url) {
+            // Extract YouTube video ID and get thumbnail
+            $videoId = $this->extractYouTubeId($this->video_url);
+            if ($videoId) {
+                return "https://img.youtube.com/vi/{$videoId}/hqdefault.jpg";
+            }
+        }
+        // Fallback to existing thumbnail logic or placeholder
+        return $this->thumbnail ?? 'https://via.placeholder.com/400x225/333/fff?text=No+Thumbnail';
+    }
+
+    private function extractYouTubeId($url)
+    {
+        $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/';
+        preg_match($pattern, $url, $match);
+        return isset($match[1]) ? $match[1] : null;
     }
 }

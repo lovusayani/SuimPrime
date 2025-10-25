@@ -110,7 +110,11 @@
                                                     {{ $movie->genres ? $movie->genres->pluck('name')->join(', ') : 'N/A' }}
                                                 </p>
                                                 <p class="media-release-date mb-1">
-                                                    {{ $movie->release_date ? $movie->release_date->format('d M Y') : '—' }}
+                                                    @if ($movie->release_date)
+                                                        {{ $movie->release_date instanceof \Carbon\Carbon ? $movie->release_date->format('d M Y') : date('d M Y', strtotime($movie->release_date)) }}
+                                                    @else
+                                                        —
+                                                    @endif
                                                 </p>
                                             </div>
                                         </div>

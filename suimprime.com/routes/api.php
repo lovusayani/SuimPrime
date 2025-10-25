@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/settings', [SettingsController::class, 'index']);
@@ -11,6 +12,19 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/me', [AuthController::class, 'me']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+// Home routes
+Route::get('/home', [HomeController::class, 'getHomeData']); // Can be accessed without auth but provides more data when authenticated
+Route::get('/movies/section/{section}', [HomeController::class, 'getMoviesBySection']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Watchlist routes
+    Route::post('/watchlist/add', [HomeController::class, 'addToWatchlist']);
+    Route::post('/watchlist/remove', [HomeController::class, 'removeFromWatchlist']);
+    
+    // Viewing progress
+    Route::post('/viewing/progress', [HomeController::class, 'updateViewingProgress']);
+});
 
 // Subscription routes
 Route::get('/plans', [SubscriptionController::class, 'getPlans']);
