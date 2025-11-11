@@ -9,7 +9,7 @@ export default defineConfig({
         __VUE_OPTIONS_API__: 'true',
         __VUE_PROD_DEVTOOLS__: 'false',
     },
-    server: {
+     server: {
         host: '127.0.0.1',
         port: 5173,
         hmr: {

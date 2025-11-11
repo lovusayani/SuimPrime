@@ -8,6 +8,7 @@ import SignUp from "../pages/SignUp.vue";
 import Landing from '../pages/Landing.vue';
 import About from '../pages/About.vue';
 import Movies from '../pages/Movies.vue';
+import MovieDetail from '../pages/MovieDetail.vue';
 import PrivacyPolicy from '../pages/PrivacyPolicy.vue';
 import HelpAndSupport from '../pages/HelpAndSupport.vue';
 import TermsConditions from '../pages/TermsConditions.vue';
@@ -27,6 +28,7 @@ const routes = [
             { path: '/home', name: 'Home', component: Home, meta: { requiresAuth: true } },    // /home route
             { path: '/about', name: 'About', component: About },
             { path: '/movies', name: 'Movies', component: Movies },
+            { path: '/movie/:id', name: 'MovieDetail', component: MovieDetail, meta: { requiresAuth: true } },
             { path: '/privacy-policy', name: 'PrivacyPolicy', component: PrivacyPolicy },
             { path: '/help-and-support', name: 'HelpAndSupport', component: HelpAndSupport },
             { path: '/terms-conditions', name: 'TermsConditions', component: TermsConditions },

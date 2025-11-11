@@ -217,7 +217,7 @@ Route::get('/', function () {
 // routes/web.php
 Route::get('/{any}', function () {
     return view('frontend.app'); // Blade view with <div id="frontend-app">
-})->where('any', '.*');
+})->where('any', '^(?!api).*$'); // Exclude API routes from catch-all
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

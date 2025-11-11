@@ -40,11 +40,32 @@ class HomeController extends Controller
             }
 
             // Get recommended movies (latest movies as recommendation)
-            $recommended = Movie::where('status', 1)
-                ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date')
+            $recommended = Movie::with(['posterTvDetails', 'genres'])
+                ->where('status', 1)
+                ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'duration', 'imdb_rating')
                 ->orderBy('created_at', 'desc')
                 ->limit(12)
-                ->get();
+                ->get()
+                ->map(function($movie) {
+                    return [
+                        'id' => $movie->id,
+                        'title' => $movie->title,
+                        'description' => strip_tags($movie->description),
+                        'video_upload_type' => $movie->video_upload_type,
+                        'video_url' => $movie->video_url,
+                        'release_date' => $movie->release_date,
+                        'duration' => $movie->duration,
+                        'imdb_rating' => $movie->imdb_rating,
+                        'poster_url' => $movie->poster_url,
+                        'thumbnail_url' => $movie->thumbnail_url,
+                        'genres' => $movie->genres->map(function($genre) {
+                            return [
+                                'id' => $genre->id,
+                                'name' => $genre->name
+                            ];
+                        })
+                    ];
+                });
 
             // Get recommended movies (featured movies or popular ones)
             // Skip the old code and use the new corrected version below
@@ -72,11 +93,33 @@ class HomeController extends Controller
             }
 
             // Get Recently Added
-            $recentlyAdded = Movie::where('status', 1)
-                ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'created_at')
+            $recentlyAdded = Movie::with(['posterTvDetails', 'genres'])
+                ->where('status', 1)
+                ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'created_at', 'duration', 'imdb_rating')
                 ->orderBy('created_at', 'desc')
                 ->limit(12)
-                ->get();
+                ->get()
+                ->map(function($movie) {
+                    return [
+                        'id' => $movie->id,
+                        'title' => $movie->title,
+                        'description' => strip_tags($movie->description),
+                        'video_upload_type' => $movie->video_upload_type,
+                        'video_url' => $movie->video_url,
+                        'release_date' => $movie->release_date,
+                        'created_at' => $movie->created_at,
+                        'duration' => $movie->duration,
+                        'imdb_rating' => $movie->imdb_rating,
+                        'poster_url' => $movie->poster_url,
+                        'thumbnail_url' => $movie->thumbnail_url,
+                        'genres' => $movie->genres->map(function($genre) {
+                            return [
+                                'id' => $genre->id,
+                                'name' => $genre->name
+                            ];
+                        })
+                    ];
+                });
 
             return response()->json([
                 'success' => true,
@@ -138,11 +181,32 @@ class HomeController extends Controller
                     break;
 
                 case 'recommended':
-                    $movies = Movie::where('status', 1)
-                        ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date')
+                    $movies = Movie::with(['posterTvDetails', 'genres'])
+                        ->where('status', 1)
+                        ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'duration', 'imdb_rating')
                         ->orderBy('created_at', 'desc')
                         ->limit($limit)
-                        ->get();
+                        ->get()
+                        ->map(function($movie) {
+                            return [
+                                'id' => $movie->id,
+                                'title' => $movie->title,
+                                'description' => strip_tags($movie->description),
+                                'video_upload_type' => $movie->video_upload_type,
+                                'video_url' => $movie->video_url,
+                                'release_date' => $movie->release_date,
+                                'duration' => $movie->duration,
+                                'imdb_rating' => $movie->imdb_rating,
+                                'poster_url' => $movie->poster_url,
+                                'thumbnail_url' => $movie->thumbnail_url,
+                                'genres' => $movie->genres->map(function($genre) {
+                                    return [
+                                        'id' => $genre->id,
+                                        'name' => $genre->name
+                                    ];
+                                })
+                            ];
+                        });
                     break;
 
                 case 'watchlist':
@@ -157,11 +221,63 @@ class HomeController extends Controller
                     break;
 
                 case 'recently-added':
-                    $movies = Movie::where('status', 1)
-                        ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'created_at')
+                    $movies = Movie::with(['posterTvDetails', 'genres'])
+                        ->where('status', 1)
+                        ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'created_at', 'duration', 'imdb_rating')
                         ->orderBy('created_at', 'desc')
                         ->limit($limit)
-                        ->get();
+                        ->get()
+                        ->map(function($movie) {
+                            return [
+                                'id' => $movie->id,
+                                'title' => $movie->title,
+                                'description' => strip_tags($movie->description),
+                                'video_upload_type' => $movie->video_upload_type,
+                                'video_url' => $movie->video_url,
+                                'release_date' => $movie->release_date,
+                                'created_at' => $movie->created_at,
+                                'duration' => $movie->duration,
+                                'imdb_rating' => $movie->imdb_rating,
+                                'poster_url' => $movie->poster_url,
+                                'thumbnail_url' => $movie->thumbnail_url,
+                                'genres' => $movie->genres->map(function($genre) {
+                                    return [
+                                        'id' => $genre->id,
+                                        'name' => $genre->name
+                                    ];
+                                })
+                            ];
+                        });
+                    break;
+
+                case 'top-movies':
+                    // Get top movies ordered by ID (descending) - showing latest movies as "top"
+                    $movies = Movie::with(['posterTvDetails', 'genres'])
+                        ->where('status', 1)
+                        ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'duration', 'imdb_rating')
+                        ->orderBy('id', 'desc')
+                        ->limit($limit)
+                        ->get()
+                        ->map(function($movie) {
+                            return [
+                                'id' => $movie->id,
+                                'title' => $movie->title,
+                                'description' => strip_tags($movie->description),
+                                'video_upload_type' => $movie->video_upload_type,
+                                'video_url' => $movie->video_url,
+                                'release_date' => $movie->release_date,
+                                'duration' => $movie->duration,
+                                'imdb_rating' => $movie->imdb_rating,
+                                'poster_url' => $movie->poster_url,
+                                'thumbnail_url' => $movie->thumbnail_url,
+                                'genres' => $movie->genres->map(function($genre) {
+                                    return [
+                                        'id' => $genre->id,
+                                        'name' => $genre->name
+                                    ];
+                                })
+                            ];
+                        });
                     break;
 
                 default:
@@ -315,6 +431,107 @@ class HomeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update viewing progress',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get top 10 movies for the Top Ten section
+     */
+    public function getTopMovies()
+    {
+        try {
+            $movies = Movie::with(['posterTvDetails', 'genres'])
+                ->where('status', 1)
+                ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'duration', 'imdb_rating')
+                ->orderBy('id', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function($movie) {
+                    return [
+                        'id' => $movie->id,
+                        'title' => $movie->title,
+                        'description' => $movie->description ? strip_tags($movie->description) : '',
+                        'video_upload_type' => $movie->video_upload_type,
+                        'video_url' => $movie->video_url,
+                        'release_date' => $movie->release_date,
+                        'duration' => $movie->duration,
+                        'imdb_rating' => $movie->imdb_rating,
+                        'poster_url' => $movie->getPosterUrlAttribute(),
+                        'thumbnail_url' => $movie->getThumbnailUrlAttribute(),
+                        'year' => $movie->release_date ? date('Y', strtotime($movie->release_date)) : null,
+                        'rating' => $movie->imdb_rating,
+                        'is_premium' => $movie->movie_access === 'paid',
+                        'genres' => $movie->genres ? $movie->genres->map(function($genre) {
+                            return [
+                                'id' => $genre->id,
+                                'name' => $genre->name
+                            ];
+                        }) : []
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $movies
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch top movies',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get recommended movies for the Recommended section
+     */
+    public function getRecommendedMovies()
+    {
+        try {
+            $movies = Movie::with(['posterTvDetails', 'genres'])
+                ->where('status', 1)
+                ->select('id', 'title', 'description', 'video_upload_type', 'video_url', 'release_date', 'duration', 'imdb_rating', 'movie_access')
+                ->orderBy('imdb_rating', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->limit(12)
+                ->get()
+                ->map(function($movie) {
+                    return [
+                        'id' => $movie->id,
+                        'title' => $movie->title,
+                        'description' => $movie->description ? strip_tags($movie->description) : '',
+                        'video_upload_type' => $movie->video_upload_type,
+                        'video_url' => $movie->video_url,
+                        'release_date' => $movie->release_date,
+                        'duration' => $movie->duration,
+                        'imdb_rating' => $movie->imdb_rating,
+                        'poster_url' => $movie->getPosterUrlAttribute(),
+                        'thumbnail_url' => $movie->getThumbnailUrlAttribute(),
+                        'year' => $movie->release_date ? date('Y', strtotime($movie->release_date)) : null,
+                        'rating' => $movie->imdb_rating,
+                        'is_premium' => $movie->movie_access === 'paid',
+                        'genres' => $movie->genres ? $movie->genres->map(function($genre) {
+                            return [
+                                'id' => $genre->id,
+                                'name' => $genre->name
+                            ];
+                        }) : []
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $movies
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch recommended movies',
                 'error' => $e->getMessage()
             ], 500);
         }

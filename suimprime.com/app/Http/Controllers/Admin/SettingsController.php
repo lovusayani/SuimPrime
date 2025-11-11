@@ -656,41 +656,49 @@ class SettingsController extends Controller
     {
         $count = Movie::count();
         
-        // Get all movie poster/tv records to delete images
-        if (Schema::hasTable('movie_posters_tv')) {
-            $posterTvRecords = MoviePosterTv::all();
-            foreach ($posterTvRecords as $record) {
-                $this->deleteImageFile($record->thumbnail);
-                $this->deleteImageFile($record->poster);
-                $this->deleteImageFile($record->poster_tv);
+        // Disable foreign key constraints
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        try {
+            // Get all movie poster/tv records to delete images
+            if (Schema::hasTable('movie_posters_tv')) {
+                $posterTvRecords = MoviePosterTv::all();
+                foreach ($posterTvRecords as $record) {
+                    $this->deleteImageFile($record->thumbnail);
+                    $this->deleteImageFile($record->poster);
+                    $this->deleteImageFile($record->poster_tv);
+                }
             }
-        }
-        
-        // Delete all related data first (foreign key constraints)
-        if (Schema::hasTable('movie_posters_tv')) {
-            MoviePosterTv::truncate();
-        }
-        if (Schema::hasTable('movie_qualities')) {
-            MovieQuality::truncate();
-        }
-        if (Schema::hasTable('movie_subtitles')) {
-            MovieSubtitle::truncate();
-        }
-        
-        // Delete pivot table relationships
-        if (Schema::hasTable('movie_actor')) {
-            DB::table('movie_actor')->truncate();
-        }
-        if (Schema::hasTable('movie_director')) {
-            DB::table('movie_director')->truncate();
-        }
-        if (Schema::hasTable('movie_genre')) {
-            DB::table('movie_genre')->truncate();
-        }
-        
-        // Finally delete movies
-        if (Schema::hasTable('movies')) {
-            Movie::truncate();
+            
+            // Delete all related data first (foreign key constraints)
+            if (Schema::hasTable('movie_posters_tv')) {
+                MoviePosterTv::truncate();
+            }
+            if (Schema::hasTable('movie_qualities')) {
+                MovieQuality::truncate();
+            }
+            if (Schema::hasTable('movie_subtitles')) {
+                MovieSubtitle::truncate();
+            }
+            
+            // Delete pivot table relationships
+            if (Schema::hasTable('movie_actor')) {
+                DB::table('movie_actor')->truncate();
+            }
+            if (Schema::hasTable('movie_director')) {
+                DB::table('movie_director')->truncate();
+            }
+            if (Schema::hasTable('movie_genre')) {
+                DB::table('movie_genre')->truncate();
+            }
+            
+            // Finally delete movies
+            if (Schema::hasTable('movies')) {
+                Movie::truncate();
+            }
+        } finally {
+            // Re-enable foreign key constraints
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
         
         return $count;
@@ -700,22 +708,30 @@ class SettingsController extends Controller
     {
         $count = Actor::count();
         
-        // Get all actors to delete their images
-        if (Schema::hasTable('actors')) {
-            $actors = Actor::all();
-            foreach ($actors as $actor) {
-                $this->deleteImageFile($actor->image);
+        // Disable foreign key constraints
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        try {
+            // Get all actors to delete their images
+            if (Schema::hasTable('actors')) {
+                $actors = Actor::all();
+                foreach ($actors as $actor) {
+                    $this->deleteImageFile($actor->image);
+                }
             }
-        }
-        
-        // Delete pivot relationships
-        if (Schema::hasTable('movie_actor')) {
-            DB::table('movie_actor')->truncate();
-        }
-        
-        // Delete actors
-        if (Schema::hasTable('actors')) {
-            Actor::truncate();
+            
+            // Delete pivot relationships
+            if (Schema::hasTable('movie_actor')) {
+                DB::table('movie_actor')->truncate();
+            }
+            
+            // Delete actors
+            if (Schema::hasTable('actors')) {
+                Actor::truncate();
+            }
+        } finally {
+            // Re-enable foreign key constraints
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
         
         return $count;
@@ -725,22 +741,30 @@ class SettingsController extends Controller
     {
         $count = Director::count();
         
-        // Get all directors to delete their images
-        if (Schema::hasTable('directors')) {
-            $directors = Director::all();
-            foreach ($directors as $director) {
-                $this->deleteImageFile($director->image);
+        // Disable foreign key constraints
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        try {
+            // Get all directors to delete their images
+            if (Schema::hasTable('directors')) {
+                $directors = Director::all();
+                foreach ($directors as $director) {
+                    $this->deleteImageFile($director->image);
+                }
             }
-        }
-        
-        // Delete pivot relationships
-        if (Schema::hasTable('movie_director')) {
-            DB::table('movie_director')->truncate();
-        }
-        
-        // Delete directors
-        if (Schema::hasTable('directors')) {
-            Director::truncate();
+            
+            // Delete pivot relationships
+            if (Schema::hasTable('movie_director')) {
+                DB::table('movie_director')->truncate();
+            }
+            
+            // Delete directors
+            if (Schema::hasTable('directors')) {
+                Director::truncate();
+            }
+        } finally {
+            // Re-enable foreign key constraints
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
         
         return $count;
@@ -750,14 +774,22 @@ class SettingsController extends Controller
     {
         $count = Genre::count();
         
-        // Delete pivot relationships
-        if (Schema::hasTable('movie_genre')) {
-            DB::table('movie_genre')->truncate();
-        }
+        // Disable foreign key constraints
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
         
-        // Delete genres
-        if (Schema::hasTable('genres')) {
-            Genre::truncate();
+        try {
+            // Delete pivot relationships
+            if (Schema::hasTable('movie_genre')) {
+                DB::table('movie_genre')->truncate();
+            }
+            
+            // Delete genres
+            if (Schema::hasTable('genres')) {
+                Genre::truncate();
+            }
+        } finally {
+            // Re-enable foreign key constraints
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
         
         return $count;

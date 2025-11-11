@@ -1,2 +1,5 @@
 /* Admin Application Styles */
-/* Add your custom CSS rules here */
+/* Import compiled admin styles from all Blade templates */
+@import "./compiled-admin-styles.css";
+
+/* Add your custom CSS rules below */

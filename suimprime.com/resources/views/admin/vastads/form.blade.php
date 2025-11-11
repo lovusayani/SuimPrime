@@ -2,20 +2,25 @@
 
 @section('content')
     <div class="conatiner-fluid content-inner pb-0" id="page_layout">
-        <a href="{{ route('admin.vastads.index') }}" class="btn btn-link d-inline-flex align-items-center gap-1 p-0 mb-3 fs-3">
+        <a href="{{ route('admin.vastads.index') }}"
+            class="btn btn-link d-inline-flex align-items-center gap-1 p-0 mb-3 fs-3">
             <i class="ph ph-caret-double-left"></i>Back
         </a>
 
+        {{-- STYLES MOVED TO: resources/css/compiled-admin-styles.css --}}
+        {{-- DO NOT EDIT HERE - Edit in compiled-admin-styles.css instead --}}
+        {{--
         <style>
             .multi-select-box span.select2-selection.select2-selection--multiple {
                 height: 100px !important;
                 overflow: auto !important;
             }
         </style>
+        --}}
 
         <form class="requires-validation" method="POST"
-            action="{{ isset($vastAd) ? route('admin.vastads.update', $vastAd->id) : route('admin.vastads.store') }}" id="form-submit"
-            enctype="multipart/form-data" data-toggle="validator">
+            action="{{ isset($vastAd) ? route('admin.vastads.update', $vastAd->id) : route('admin.vastads.store') }}"
+            id="form-submit" enctype="multipart/form-data" data-toggle="validator">
             @csrf
             @if (isset($vastAd))
                 @method('PUT')

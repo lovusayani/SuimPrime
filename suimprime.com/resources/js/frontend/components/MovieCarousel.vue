@@ -33,11 +33,13 @@
                 v-for="(movie, index) in movies"
                 :key="movie.id"
                 class="position-relative movie-card"
+                @click="goToMovie(movie)"
             >
                 <img
                     :src="movie.image"
                     class="img-fluid rounded-3"
                     :alt="movie.title"
+                    @error="handleImageError"
                 />
                 <span
                     v-if="movie.rent"
@@ -52,9 +54,12 @@
 </template>
 
 <script setup>
+import { useRouter } from "vue-router";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/swiper-bundle.css";
+
+const router = useRouter();
 
 defineProps({
     title: String,
@@ -62,6 +67,18 @@ defineProps({
     overlap: { type: Boolean, default: false },
     showRank: { type: Boolean, default: false },
 });
+
+function handleImageError(event) {
+    console.warn("Image failed to load:", event.target.src);
+    // Set a fallback image
+    event.target.src =
+        "https://via.placeholder.com/300x450/333/fff?text=No+Image";
+}
+
+function goToMovie(movie) {
+    // Navigate to movie detail page
+    router.push(`/movie/${movie.id}`);
+}
 </script>
 
 <style scoped>
@@ -134,6 +151,7 @@ defineProps({
     overflow: hidden;
     flex: 0 0 auto;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .movie-card:hover {

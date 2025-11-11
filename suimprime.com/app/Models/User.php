@@ -124,4 +124,5 @@ class User extends Authenticatable
                     ->withTimestamps()
                     ->orderBy('user_viewing_history.last_watched_at', 'desc');
     }
+
 }

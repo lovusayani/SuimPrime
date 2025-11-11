@@ -41,9 +41,13 @@
             href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300&amp;display=swap"
             rel="stylesheet">
 
+        {{-- STYLES MOVED TO: resources/css/compiled-admin-styles.css --}}
+        {{-- DO NOT EDIT HERE - Edit in compiled-admin-styles.css instead --}}
+        {{--
         <style>
             :root {}
         </style>
+        --}}
     </head>
 
     <body>
@@ -132,6 +136,9 @@
             </div>
 
             <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+            {{-- STYLES MOVED TO: resources/css/compiled-admin-styles.css --}}
+            {{-- DO NOT EDIT HERE - Edit in compiled-admin-styles.css instead --}}
+            {{--
             <style>
                 .select2-container--default .select2-selection--single .select2-selection__rendered {
                     line-height: inherit;
@@ -143,6 +150,7 @@
                     height: 100%;
                 }
             </style>
+            --}}
 
             <!-- Select2 JS -->
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" type="text/javascript"></script>

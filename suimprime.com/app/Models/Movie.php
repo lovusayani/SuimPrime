@@ -93,6 +93,12 @@ class Movie extends Model
     // Accessor to get poster/thumbnail URL from video_url or default
     public function getPosterUrlAttribute()
     {
+        // First, check if we have uploaded poster in posterTvDetails
+        if ($this->posterTvDetails && $this->posterTvDetails->poster) {
+            return $this->posterTvDetails->poster;
+        }
+        
+        // Fallback to YouTube thumbnail if it's a YouTube video
         if ($this->video_upload_type === 'YouTube' && $this->video_url) {
             // Extract YouTube video ID and get thumbnail
             $videoId = $this->extractYouTubeId($this->video_url);
@@ -100,12 +106,19 @@ class Movie extends Model
                 return "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
             }
         }
-        // Fallback to existing thumbnail logic or placeholder
-        return $this->thumbnail ?? 'https://via.placeholder.com/300x450/333/fff?text=No+Poster';
+        
+        // Final fallback to placeholder
+        return 'https://via.placeholder.com/300x450/333/fff?text=No+Poster';
     }
 
     public function getThumbnailUrlAttribute()
     {
+        // First, check if we have uploaded thumbnail in posterTvDetails
+        if ($this->posterTvDetails && $this->posterTvDetails->thumbnail) {
+            return $this->posterTvDetails->thumbnail;
+        }
+        
+        // Fallback to YouTube thumbnail if it's a YouTube video
         if ($this->video_upload_type === 'YouTube' && $this->video_url) {
             // Extract YouTube video ID and get thumbnail
             $videoId = $this->extractYouTubeId($this->video_url);
@@ -113,8 +126,9 @@ class Movie extends Model
                 return "https://img.youtube.com/vi/{$videoId}/hqdefault.jpg";
             }
         }
-        // Fallback to existing thumbnail logic or placeholder
-        return $this->thumbnail ?? 'https://via.placeholder.com/400x225/333/fff?text=No+Thumbnail';
+        
+        // Final fallback to placeholder
+        return 'https://via.placeholder.com/400x225/333/fff?text=No+Thumbnail';
     }
 
     private function extractYouTubeId($url)

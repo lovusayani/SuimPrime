@@ -2,14 +2,9 @@
     <div>
         <HeroSlider />
         <!-- Top 10 Section -->
-        <MovieCarousel
-            title="Top 10 Movies"
-            :movies="topMovies"
-            :show-rank="true"
-            :overlap="true"
-        />
+       <!--  <TopTenMovies /> -->
 
-         <!-- 💸 Pay Per View -->
+        <!-- 💸 Pay Per View -->
         <MovieCarousel title="Pay Per View" :movies="payPerView" />
 
         <!-- 🌟 Popular Movies -->
@@ -21,225 +16,70 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
 import HeroSlider from "../components/HeroSlider.vue";
 import MovieCarousel from "../components/MovieCarousel.vue";
+import TopTenMovies from "../components/TopTenMovies.vue";
+import axios from "../axios";
 
-const topMovies = [
-    {
-        id: 1,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 2,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 3,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 4,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 5,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-    {
-        id: 6,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 7,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 8,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 9,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 10,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-];
-const payPerView = [
-    {
-        id: 1,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 2,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 3,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 4,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 5,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-    {
-        id: 6,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 7,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 8,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 9,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 10,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-];
-const popularMovies = [
-    {
-        id: 1,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 2,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 3,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 4,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 5,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-    {
-        id: 6,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 7,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 8,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 9,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 10,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-];
-const latestMovies = [
-    {
-        id: 1,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 2,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 3,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 4,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 5,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-    {
-        id: 6,
-        title: "Broken Sanctuary",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/broken_sanctuary_poster.png",
-    },
-    {
-        id: 7,
-        title: "Vengeance in the Wild",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/vengeance_in_the_wild_poster.png",
-        rent: true,
-    },
-    {
-        id: 8,
-        title: "The Charlie Game",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/the_charlie_game_shadows_unleashed_poster.png",
-    },
-    {
-        id: 9,
-        title: "Family Feud Fiasco",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/family_feud_fiasco_poster.png",
-    },
-    {
-        id: 10,
-        title: "Hearts of Valor",
-        image: "https://apps.iqonic.design/streamit-laravel/storage/streamit-laravel/hearts_of_valor_poster.png",
-    },
-];
+// Reactive data
+const payPerView = ref([]);
+const popularMovies = ref([]);
+const latestMovies = ref([]);
+
+// Fetch movies from API
+const fetchMovieData = async () => {
+    try {
+        // Fetch different sections
+        const [payPerViewResponse, popularResponse, latestResponse] =
+            await Promise.all([
+                axios.get("/api/movies/section/recommended?limit=8"), // Using recommended for now
+                axios.get("/api/movies/section/recommended?limit=12"),
+                axios.get("/api/movies/section/recently-added?limit=12"),
+            ]);
+
+        if (payPerViewResponse.data.success) {
+            payPerView.value = payPerViewResponse.data.movies.map((movie) => ({
+                ...movie,
+                image: movie.poster_url || movie.thumbnail_url,
+                rent: true,
+            }));
+        }
+
+        if (popularResponse.data.success) {
+            popularMovies.value = popularResponse.data.movies.map((movie) => ({
+                ...movie,
+                image: movie.poster_url || movie.thumbnail_url,
+            }));
+        }
+
+        if (latestResponse.data.success) {
+            latestMovies.value = latestResponse.data.movies.map((movie) => ({
+                ...movie,
+                image: movie.poster_url || movie.thumbnail_url,
+            }));
+        }
+    } catch (error) {
+        console.error("Failed to fetch movie data:", error);
+
+        // Fallback to sample data if API fails
+        const fallbackMovies = [
+            {
+                id: 1,
+                title: "Sample Movie",
+                image: "https://via.placeholder.com/300x450/333/fff?text=Sample+Movie",
+            },
+        ];
+
+        payPerView.value = fallbackMovies;
+        popularMovies.value = fallbackMovies;
+        latestMovies.value = fallbackMovies;
+    }
+};
+
+onMounted(() => {
+    fetchMovieData();
+});
 </script>
 <style scoped>
 .home-page {

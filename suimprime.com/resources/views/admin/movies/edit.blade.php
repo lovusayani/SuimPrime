@@ -1,11 +1,14 @@
 @extends('layouts.admin')
 @section('title', 'Edit Movie')
-
 @push('styles')
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    {{-- STYLES MOVED TO: resources/css/compiled-admin-styles.css --}}
+    {{-- DO NOT EDIT HERE - Edit in compiled-admin-styles.css instead --}}
+    {{--
     <style>
         /* Select2 Dark Theme Styling */
         .select2-container--default .select2-selection--multiple {
@@ -217,6 +220,7 @@
             background-color: var(--bs-dark-bg-subtle) !important;
         }
     </style>
+    --}}
 @endpush
 
 @section('content')

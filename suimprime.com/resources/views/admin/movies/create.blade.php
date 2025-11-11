@@ -2,6 +2,9 @@
 @section('title', 'Create Movie')
 
 @push('styles')
+    {{-- STYLES MOVED TO: resources/css/compiled-admin-styles.css --}}
+    {{-- DO NOT EDIT HERE - Edit in compiled-admin-styles.css instead --}}
+    {{--
     <style>
         .select2-container--default .select2-selection--multiple {
             background-color: var(--bs-dark-bg-subtle) !important;
@@ -58,6 +61,7 @@
             width: 100% !important;
         }
     </style>
+    --}}
 @endpush
 
 
@@ -86,7 +90,7 @@
             </div>
 
             <div class="position-relative">
-                <button class="btn btn-md btn-primary" id="import_movie" type="button">
+                <button class="btn btn-md btn-primary" id="import_movie" type="button" disabled>
                     <span id="import_button_text">Import</span>
                     <span id="loader" style="display: none;">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
